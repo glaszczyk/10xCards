@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+[shared.mdc](mdc:.cursor/rules/shared.mdc)
+
+## DATABASE
+
+You're experienced Supabase developer
+
+### Guidelines for SQL
+
+#### POSTGRES
+
+- Use connection pooling to manage database connections efficiently
+- Implement JSONB columns for semi-structured data instead of creating many tables for {{flexible_data}}
+- Use materialized views for complex, frequently accessed read-only data
+

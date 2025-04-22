@@ -1,0 +1,56 @@
+---
+description: 
+globs: *.tsx,*.jsx,*.mdx
+alwaysApply: false
+---
+[shared.mdc](mdc:.cursor/rules/shared.mdc)
+
+## FRONTEND
+
+### Guidelines for STYLING
+
+#### TAILWIND
+
+- Use the @layer directive to organize styles into components, utilities, and base layers
+- Implement Just-in-Time (JIT) mode for development efficiency and smaller CSS bundles
+- Use arbitrary values with square brackets (e.g., w-[123px]) for precise one-off designs
+- Leverage the @apply directive in component classes to reuse utility combinations
+- Implement the Tailwind configuration file for customizing theme, plugins, and variants
+- Use component extraction for repeated UI patterns instead of copying utility classes
+- Leverage the theme() function in CSS for accessing Tailwind theme values
+- Implement dark mode with the dark: variant
+- Use responsive variants (sm:, md:, lg:, etc.) for adaptive designs
+- Leverage state variants (hover:, focus:, active:, etc.) for interactive elements
+
+## FRONTEND
+
+### Guidelines for ACCESSIBILITY
+
+#### WCAG_PERCEIVABLE
+
+- Provide text alternatives for non-text content including images, icons, and graphics with appropriate alt attributes
+- Ensure pre-recorded audio-visual content has captions, audio descriptions, and transcripts for {{media_content}}
+- Maintain minimum contrast ratios of 4.5:1 for normal text and 3:1 for large text and UI components
+- Enable content to be presented in different ways without losing information or structure when zoomed or resized
+- Avoid using color alone to convey information; pair with text, patterns, or icons for {{status_indicators}}
+- Provide controls to pause, stop, or hide any moving, blinking, or auto-updating content
+- Ensure text can be resized up to 200% without loss of content or functionality in {{responsive_layouts}}
+- Use responsive design that adapts to different viewport sizes and zoom levels without horizontal scrolling
+- Enable users to customize text spacing (line height, paragraph spacing, letter/word spacing) without breaking layouts
+
+## FRONTEND
+
+### Guidelines for ACCESSIBILITY
+
+#### ARIA
+
+- Use ARIA landmarks to identify regions of the page (main, navigation, search, etc.)
+- Apply appropriate ARIA roles to custom interface elements that lack semantic HTML equivalents
+- Set aria-expanded and aria-controls for expandable content like accordions and dropdowns
+- Use aria-live regions with appropriate politeness settings for dynamic content updates
+- Implement aria-hidden to hide decorative or duplicative content from screen readers
+- Apply aria-label or aria-labelledby for elements without visible text labels
+- Use aria-describedby to associate descriptive text with form inputs or complex elements
+- Implement aria-current for indicating the current item in a set, navigation, or process
+- Avoid redundant ARIA that duplicates the semantics of native HTML elements
+- Apply aria-invalid and appropriate error messaging for form validation in {{form_validation}}
