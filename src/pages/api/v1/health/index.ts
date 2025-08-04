@@ -1,6 +1,9 @@
 import type { APIRoute } from "astro";
 import { DataProviderFactory } from "../../../../lib/data/provider-factory";
 
+// Wymagane dla endpointów API w Astro
+export const prerender = false;
+
 /**
  * GET /api/v1/health
  * Check the health status of the application and data providers
@@ -55,5 +58,48 @@ export const GET: APIRoute = async () => {
         "Content-Type": "application/json",
       },
     });
+  }
+};
+
+/**
+ * POST /api/v1/health
+ * Test POST method
+ */
+export const POST: APIRoute = async ({ request }) => {
+  console.log("POST /api/v1/health - Test endpoint called");
+
+  try {
+    const body = await request.json();
+    console.log("Health POST body:", body);
+
+    return new Response(
+      JSON.stringify({
+        status: "ok",
+        message: "POST method works",
+        receivedData: body,
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Health POST error:", error);
+
+    return new Response(
+      JSON.stringify({
+        status: "error",
+        message: "POST method failed",
+        error: error instanceof Error ? error.message : "Unknown error",
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 };

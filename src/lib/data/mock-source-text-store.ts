@@ -1,5 +1,7 @@
-import type { SourceTextWithFlashcardsResponse } from "./types";
+import type { SourceTextWithFlashcardsResponse } from "../../pages/api/v1/source-texts/[id]/types";
+import type { SourceTextResponse } from "../../pages/api/v1/source-texts/types";
 
+// Wspólny store mocków dla source-texts
 export const mockSourceTexts: SourceTextWithFlashcardsResponse[] = [
   {
     id: "text-123",
@@ -45,8 +47,35 @@ export const mockSourceTexts: SourceTextWithFlashcardsResponse[] = [
   },
 ];
 
+// CRUD helpers
 export function getMockSourceTextById(
   id: string
 ): SourceTextWithFlashcardsResponse | null {
   return mockSourceTexts.find((text) => text.id === id) || null;
+}
+
+export function addMockSourceText(text: SourceTextResponse) {
+  const newText: SourceTextWithFlashcardsResponse = {
+    ...text,
+    flashcards: [],
+    flashcardCount: 0,
+  };
+  mockSourceTexts.unshift(newText);
+}
+
+export function updateMockSourceText(
+  id: string,
+  updates: Partial<Omit<SourceTextResponse, "id">>
+) {
+  const idx = mockSourceTexts.findIndex((t) => t.id === id);
+  if (idx === -1) return null;
+  mockSourceTexts[idx] = { ...mockSourceTexts[idx], ...updates };
+  return mockSourceTexts[idx];
+}
+
+export function deleteMockSourceText(id: string) {
+  const idx = mockSourceTexts.findIndex((t) => t.id === id);
+  if (idx === -1) return false;
+  mockSourceTexts.splice(idx, 1);
+  return true;
 }

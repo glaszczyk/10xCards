@@ -2,6 +2,11 @@ import type { APIRoute } from "astro";
 import { DataProviderFactory } from "../../../../lib/data/provider-factory";
 import { CreateFlashcardSchema, validateFlashcardQuery } from "./validation";
 
+// Wymagane dla endpointów API w Astro
+export const prerender = false;
+
+console.log("Flashcards API module loaded at:", new Date().toISOString());
+
 /**
  * GET /api/v1/flashcards
  * Retrieve user flashcards with pagination and filtering
@@ -98,11 +103,15 @@ export const GET: APIRoute = async ({ request, url }) => {
  * Create new flashcards (manual or AI mode)
  */
 export const POST: APIRoute = async ({ request }) => {
+  console.log("POST /api/v1/flashcards - Starting request processing");
+
   try {
     const body = await request.json();
+    console.log("Request body:", body);
 
     // Validate request body
     const validatedData = CreateFlashcardSchema.parse(body);
+    console.log("Validated data:", validatedData);
 
     // Get the appropriate data provider
     const provider = DataProviderFactory.getProvider();
@@ -112,12 +121,14 @@ export const POST: APIRoute = async ({ request }) => {
     let response;
 
     if (validatedData.mode === "manual") {
+      console.log("Creating manual flashcard...");
       // Create manual flashcard
       const newCard = await provider.createManualFlashcard({
         front: validatedData.front,
         back: validatedData.back,
         sourceTextId: validatedData.sourceTextId,
       });
+      console.log("Created manual flashcard:", newCard);
 
       response = {
         data: [newCard],
@@ -127,12 +138,15 @@ export const POST: APIRoute = async ({ request }) => {
         },
       };
     } else {
+      console.log("Creating AI flashcards...");
       // Create AI flashcards
       response = await provider.createAIFlashcards({
         textContent: validatedData.textContent,
       });
+      console.log("Created AI flashcards:", response);
     }
 
+    console.log("Sending response:", response);
     return new Response(JSON.stringify(response), {
       status: 201,
       headers: {
@@ -141,6 +155,14 @@ export const POST: APIRoute = async ({ request }) => {
     });
   } catch (error) {
     console.error("Error creating flashcards:", error);
+    console.error(
+      "Error stack:",
+      error instanceof Error ? error.stack : "No stack trace"
+    );
+    console.error(
+      "Error name:",
+      error instanceof Error ? error.name : "Unknown error type"
+    );
 
     // Handle validation errors
     if (error instanceof Error && error.message.includes("validation")) {

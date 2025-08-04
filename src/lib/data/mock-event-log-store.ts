@@ -1,5 +1,10 @@
-import type { EventLogResponse, EventSeverity, EventType } from "./types";
+import type {
+  EventLogResponse,
+  EventSeverity,
+  EventType,
+} from "../../pages/api/v1/event-logs/types";
 
+// Wspólny store mocków dla event-logs
 export const mockEventLogs: EventLogResponse[] = [
   {
     id: "event-1",
@@ -70,6 +75,7 @@ export const mockEventLogs: EventLogResponse[] = [
   },
 ];
 
+// CRUD helpers
 export function getMockEventLogs(
   page: number = 1,
   perPage: number = 20,
@@ -97,7 +103,9 @@ export function getMockEventLogs(
   }
 
   // Sort by timestamp (newest first)
-  filtered.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+  filtered = [...filtered].sort((a, b) =>
+    b.timestamp.localeCompare(a.timestamp)
+  );
 
   // Apply pagination
   const startIndex = (page - 1) * perPage;
@@ -108,6 +116,10 @@ export function getMockEventLogs(
     data: paginatedData,
     total: filtered.length,
   };
+}
+
+export function addMockEventLog(event: EventLogResponse) {
+  mockEventLogs.unshift(event);
 }
 
 export function getEventLogSummary(): {

@@ -1,7 +1,25 @@
 import type { APIRoute } from "astro";
-import { createMockSourceText } from "./mock-data";
+import { addMockSourceText } from "../../../../lib/data/mock-source-text-store";
 import type { ApiResponse, SourceTextResponse } from "./types";
 import { CreateSourceTextSchema } from "./validation";
+
+// Wymagane dla endpointów API w Astro
+export const prerender = false;
+
+// Funkcja do tworzenia mock source text
+function createMockSourceText(textContent: string): SourceTextResponse {
+  const newId = `text-${Date.now()}`;
+  const now = new Date().toISOString();
+
+  const newText: SourceTextResponse = {
+    id: newId,
+    textContent,
+    createdAt: now,
+  };
+
+  addMockSourceText(newText);
+  return newText;
+}
 
 /**
  * POST /api/v1/source-texts
@@ -14,7 +32,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Validate request body
     const validatedData = CreateSourceTextSchema.parse(body);
 
-    // Mock: create source text
+    // Create source text using global store
     const newSourceText = createMockSourceText(validatedData.textContent);
 
     const response: ApiResponse<SourceTextResponse> = { data: newSourceText };

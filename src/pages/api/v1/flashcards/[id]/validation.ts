@@ -1,7 +1,19 @@
 import { z } from "zod";
 
 export const FlashcardIdParamSchema = z.object({
-  id: z.string().uuid({ message: "Invalid UUID format" }),
+  id: z.string().refine(
+    (id) => {
+      // Akceptuj UUID lub mock ID (mock-{timestamp}-{random})
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const mockIdRegex = /^mock-\d+-[a-z0-9]+$/;
+      return uuidRegex.test(id) || mockIdRegex.test(id);
+    },
+    {
+      message:
+        "Invalid ID format. Must be UUID or mock ID (mock-{timestamp}-{random})",
+    }
+  ),
 });
 
 // PATCH /flashcards/:id validation

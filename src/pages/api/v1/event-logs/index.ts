@@ -1,7 +1,13 @@
 import type { APIRoute } from "astro";
-import { getEventLogSummary, getMockEventLogs } from "./mock-data";
+import {
+  getEventLogSummary,
+  getMockEventLogs,
+} from "../../../../lib/data/mock-event-log-store";
 import type { EventLogsResponse } from "./types";
 import { validateEventLogQuery } from "./validation";
+
+// Wymagane dla endpointów API w Astro
+export const prerender = false;
 
 /**
  * GET /api/v1/event-logs
@@ -16,7 +22,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     // For now, use a default user ID (will be replaced with auth later)
     const userId = "default-user-id";
 
-    // Use mock data with filtering and pagination
+    // Use mock data with filtering and pagination from global store
     const { data: eventLogs, total } = getMockEventLogs(
       validatedQuery.page,
       validatedQuery.perPage,
@@ -26,7 +32,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       validatedQuery.endDate
     );
 
-    // Get summary statistics
+    // Get summary statistics from global store
     const summary = getEventLogSummary();
 
     const response: EventLogsResponse = {

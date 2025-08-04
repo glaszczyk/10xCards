@@ -1,14 +1,17 @@
 import type { APIRoute } from "astro";
-import { getMockSourceTextById } from "./mock-data";
+import { getMockSourceTextById } from "../../../../../lib/data/mock-source-text-store";
 import type { ApiResponse, SourceTextWithFlashcardsResponse } from "./types";
 import { SourceTextIdParamSchema } from "./validation";
+
+// Wymagane dla endpointów API w Astro
+export const prerender = false;
 
 export const GET: APIRoute = async ({ params }) => {
   try {
     // Walidacja parametru id
     const { id } = SourceTextIdParamSchema.parse(params);
 
-    // Mock: pobierz tekst źródłowy po id
+    // Pobierz tekst źródłowy po id z globalnego store
     const sourceText = getMockSourceTextById(id);
     if (!sourceText) {
       return new Response(

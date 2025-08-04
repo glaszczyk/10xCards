@@ -3,7 +3,7 @@ import {
   deleteMockFlashcard,
   getMockFlashcardById,
   updateMockFlashcard,
-} from "./mock-data";
+} from "../../../../lib/data/mock-flashcard-store";
 import type {
   ApiResponse,
   FlashcardDetailResponse,
@@ -11,14 +11,21 @@ import type {
 } from "./types";
 import { FlashcardIdParamSchema, UpdateFlashcardSchema } from "./validation";
 
+// Wymagane dla endpointów API w Astro
+export const prerender = false;
+
 export const GET: APIRoute = async ({ params }) => {
+  console.log("🚀 GET /api/v1/flashcards/:id called with params:", params);
+
   try {
     // Walidacja parametru id
     const { id } = FlashcardIdParamSchema.parse(params);
+    console.log("✅ Validation passed, searching for ID:", id);
 
-    // Mock: pobierz fiszkę po id
+    // Pobierz fiszkę po id z globalnego store
     const card = getMockFlashcardById(id);
     if (!card) {
+      console.log("❌ Flashcard not found");
       return new Response(
         JSON.stringify({
           error: {
@@ -30,12 +37,14 @@ export const GET: APIRoute = async ({ params }) => {
       );
     }
 
+    console.log("✅ Flashcard found:", card.id);
     const response: ApiResponse<FlashcardDetailResponse> = { data: card };
     return new Response(JSON.stringify(response), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
+    console.log("❌ Validation error:", error);
     return new Response(
       JSON.stringify({
         error: {
@@ -61,7 +70,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     const body = await request.json();
     const validatedUpdates = UpdateFlashcardSchema.parse(body);
 
-    // Mock: aktualizuj fiszkę
+    // Aktualizuj fiszkę w globalnym store
     const updatedCard = updateMockFlashcard(id, validatedUpdates);
     if (!updatedCard) {
       return new Response(
@@ -119,7 +128,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     // Walidacja parametru id
     const { id } = FlashcardIdParamSchema.parse(params);
 
-    // Mock: usuń fiszkę
+    // Usuń fiszkę z globalnego store
     const deleted = deleteMockFlashcard(id);
     if (!deleted) {
       return new Response(

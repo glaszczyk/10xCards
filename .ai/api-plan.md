@@ -126,6 +126,54 @@
   - `start_date` (opcjonalny)
   - `end_date` (opcjonalny)
 
+#### Logowanie zdarzeń (automatyczne)
+
+**UWAGA**: Logi zdarzeń są tworzone automatycznie przez system, a nie przez bezpośrednie wywołania API. Nie ma endpointu POST dla event logs.
+
+**Mechanizm logowania:**
+
+- Logi są tworzone automatycznie w innych endpointach (np. przy tworzeniu/edycji/usuwaniu fiszek)
+- Używana jest funkcja `logEvent()` wewnątrz endpointów
+- Logi są zapisywane bezpośrednio do bazy danych przez Supabase Client
+- RLS (Row Level Security) zapewnia, że użytkownicy mogą logować tylko swoje zdarzenia
+
+**Przykłady automatycznego logowania:**
+
+```typescript
+// Przy tworzeniu fiszki ręcznej
+await logEvent({
+  userId: authContext.userId,
+  eventType: "manual_card_created",
+  payload: { flashcardId: flashcard.id },
+});
+
+// Przy edycji fiszki
+await logEvent({
+  userId: authContext.userId,
+  eventType: "card_edited",
+  payload: {
+    flashcardId: flashcard.id,
+    changedFields: ["front", "back"],
+  },
+});
+
+// Przy usuwaniu fiszki
+await logEvent({
+  userId: authContext.userId,
+  eventType: "card_deleted",
+  payload: { flashcardId: flashcard.id },
+});
+```
+
+**Typy zdarzeń:**
+
+- `ai_card_created` - utworzono fiszkę przez AI
+- `ai_edited_card_created` - utworzono fiszkę edytowaną przez AI
+- `manual_card_created` - utworzono fiszkę ręcznie
+- `card_edited` - edytowano fiszkę
+- `card_deleted` - usunięto fiszkę
+- `ai_card_reviewed` - przejrzano fiszkę AI
+
 ### 2.4 Wersjonowanie API
 
 - Używamy wersjonowania w URL (`/api/v1/`)
