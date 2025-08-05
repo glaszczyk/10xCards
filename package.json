@@ -21,9 +21,8 @@
     "lucide-react": "^0.501.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "tailwind-merge": "^3.2.0",
-    "tailwindcss": "^4.1.4",
-    "tw-animate-css": "^1.2.5"
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.4"
   },
   "devDependencies": {
     "@typescript-eslint/parser": "^8.31.0",
@@ -31,6 +30,7 @@
     "eslint-plugin-astro": "^1.3.1",
     "prettier": "^3.5.3",
     "prettier-plugin-astro": "^0.14.1",
-    "supabase": "^2.22.4"
+    "supabase": "^2.22.4",
+    "tw-animate-css": "^1.3.6"
   }
 }
