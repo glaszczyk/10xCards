@@ -1,25 +1,108 @@
 import type { APIRoute } from "astro";
-import { addMockSourceText } from "../../../../lib/data/mock-source-text-store";
+import { DataProviderFactory } from "../../../../lib/data/provider-factory";
 import type { ApiResponse, SourceTextResponse } from "./types";
 import { CreateSourceTextSchema } from "./validation";
 
 // Wymagane dla endpointów API w Astro
 export const prerender = false;
 
-// Funkcja do tworzenia mock source text
-function createMockSourceText(textContent: string): SourceTextResponse {
-  const newId = `text-${Date.now()}`;
-  const now = new Date().toISOString();
+/**
+ * GET /api/v1/source-texts
+ * Retrieve user source texts with pagination and sorting
+ */
+export const GET: APIRoute = async ({ request, url }) => {
+  try {
+    // Parse and validate query parameters
+    const queryParams = Object.fromEntries(url.searchParams.entries());
+    console.log("Raw query params:", queryParams);
 
-  const newText: SourceTextResponse = {
-    id: newId,
-    textContent,
-    createdAt: now,
-  };
+    // Default values
+    const page = parseInt(queryParams.page || "1");
+    const perPage = parseInt(queryParams.perPage || "10");
+    const sort = (queryParams.sort || "createdAt") as "createdAt";
+    const order = (queryParams.order || "desc") as "asc" | "desc";
 
-  addMockSourceText(newText);
-  return newText;
-}
+    // Validate parameters
+    if (page < 1 || perPage < 1 || perPage > 100) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Invalid pagination parameters",
+          },
+        }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    // Get the appropriate data provider
+    const provider = DataProviderFactory.getProvider();
+    const providerType = DataProviderFactory.getCurrentProviderType();
+    console.log(`Using data provider: ${providerType}`);
+
+    // Fetch source texts using the provider
+    const response = await provider.getSourceTexts({
+      page,
+      perPage,
+      sort,
+      order,
+    });
+
+    console.log(
+      `Returning ${response.data.length} source texts out of ${response.meta.pagination.total} total`
+    );
+
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "max-age=60, must-revalidate",
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching source texts:", error);
+
+    // Handle database connection errors
+    if (error instanceof Error && error.message.includes("Database error")) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "DATABASE_ERROR",
+            message: "Database connection failed",
+            details: error.message,
+          },
+        }),
+        {
+          status: 503,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    // Handle other errors
+    return new Response(
+      JSON.stringify({
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to fetch source texts",
+        },
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
+};
 
 /**
  * POST /api/v1/source-texts
@@ -32,8 +115,15 @@ export const POST: APIRoute = async ({ request }) => {
     // Validate request body
     const validatedData = CreateSourceTextSchema.parse(body);
 
-    // Create source text using global store
-    const newSourceText = createMockSourceText(validatedData.textContent);
+    // Get the appropriate data provider
+    const provider = DataProviderFactory.getProvider();
+    const providerType = DataProviderFactory.getCurrentProviderType();
+    console.log(`Using data provider: ${providerType}`);
+
+    // Create source text using provider
+    const newSourceText = await provider.createSourceText({
+      textContent: validatedData.textContent,
+    });
 
     const response: ApiResponse<SourceTextResponse> = { data: newSourceText };
     return new Response(JSON.stringify(response), {
@@ -57,6 +147,25 @@ export const POST: APIRoute = async ({ request }) => {
         }),
         {
           status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+
+    // Handle database connection errors
+    if (error instanceof Error && error.message.includes("Database error")) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "DATABASE_ERROR",
+            message: "Database connection failed",
+            details: error.message,
+          },
+        }),
+        {
+          status: 503,
           headers: {
             "Content-Type": "application/json",
           },

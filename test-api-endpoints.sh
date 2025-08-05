@@ -29,6 +29,8 @@ show_help() {
     echo "  flashcard-patch [id] # PATCH /api/v1/flashcards/:id"
     echo "  flashcard-delete [id]# DELETE /api/v1/flashcards/:id"
     echo "  source-texts-post    # POST /api/v1/source-texts"
+    echo "  source-texts-get     # GET /api/v1/source-texts"
+    echo "  source-texts-filtered# GET /api/v1/source-texts (with filters)"
     echo "  source-text-get [id] # GET /api/v1/source-texts/:id"
     echo "  event-logs           # GET /api/v1/event-logs"
     echo "  errors               # Testy błędów"
@@ -211,6 +213,28 @@ test_source_texts_post() {
     echo ""
 }
 
+test_source_texts_get() {
+    echo -e "${BLUE}8a. Testing Source Texts - GET (list)${NC}"
+    echo "GET /api/v1/source-texts"
+    curl -s -X GET "$BASE_URL/source-texts" \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $AUTH_TOKEN" \
+      -w "\nHTTP Status: %{http_code}\n" \
+      | jq '.' 2>/dev/null || echo "Response (no jq):"
+    echo ""
+}
+
+test_source_texts_get_filtered() {
+    echo -e "${BLUE}8b. Testing Source Texts - GET (with filters)${NC}"
+    echo "GET /api/v1/source-texts?page=1&per_page=5&sort=createdAt&order=desc"
+    curl -s -X GET "$BASE_URL/source-texts?page=1&per_page=5&sort=createdAt&order=desc" \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $AUTH_TOKEN" \
+      -w "\nHTTP Status: %{http_code}\n" \
+      | jq '.' 2>/dev/null || echo "Response (no jq):"
+    echo ""
+}
+
 test_source_text_get() {
     local source_text_id="${1:-text-123}"
     echo -e "${BLUE}9. Testing Source Texts - GET (single source text)${NC}"
@@ -327,6 +351,12 @@ if [ -n "$ENDPOINT" ]; then
         "source-texts-post")
             test_source_texts_post
             ;;
+        "source-texts-get")
+            test_source_texts_get
+            ;;
+        "source-texts-filtered")
+            test_source_texts_get_filtered
+            ;;
         "source-text-get")
             test_source_text_get "$2"
             ;;
@@ -358,6 +388,8 @@ else
     test_flashcard_patch
     test_flashcard_delete
     test_source_texts_post
+    test_source_texts_get
+    test_source_texts_get_filtered
     test_source_text_get
     test_event_logs_get
     test_event_logs_get_filtered

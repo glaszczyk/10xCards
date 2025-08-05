@@ -1,4 +1,12 @@
+import type {
+  EventLogQuery,
+  EventLogsResponse,
+} from "../../pages/api/v1/event-logs/types";
 import type { FlashcardResponse } from "../../pages/api/v1/flashcards/types";
+import type {
+  SourceTextResponse,
+  SourceTextWithFlashcardsResponse,
+} from "../../pages/api/v1/source-texts/[id]/types";
 import type {
   DataProvider,
   FlashcardCreateAIData,
@@ -6,8 +14,25 @@ import type {
   FlashcardCreateResponse,
   FlashcardListResponse,
   FlashcardQuery,
+  FlashcardUpdateData,
+  SourceTextCreateData,
+  SourceTextListResponse,
+  SourceTextQuery,
 } from "./interface";
-import { addMockFlashcard, mockFlashcards } from "./mock-flashcard-store";
+import { getEventLogSummary, getMockEventLogs } from "./mock-event-log-store";
+import {
+  addMockFlashcard,
+  deleteMockFlashcard,
+  mockFlashcards,
+  updateMockFlashcard,
+} from "./mock-flashcard-store";
+import {
+  addMockSourceText,
+  deleteMockSourceText,
+  getMockSourceTextById,
+  mockSourceTexts,
+  updateMockSourceText,
+} from "./mock-source-text-store";
 
 export class MockProvider implements DataProvider {
   async getFlashcards(query: FlashcardQuery): Promise<FlashcardListResponse> {
@@ -129,8 +154,133 @@ export class MockProvider implements DataProvider {
     };
   }
 
+  async getFlashcardById(id: string): Promise<FlashcardResponse | null> {
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    return mockFlashcards.find((card) => card.id === id) || null;
+  }
+
+  async updateFlashcard(
+    id: string,
+    data: FlashcardUpdateData
+  ): Promise<FlashcardResponse | null> {
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    return updateMockFlashcard(id, data);
+  }
+
+  async deleteFlashcard(id: string): Promise<boolean> {
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    return deleteMockFlashcard(id);
+  }
+
   async isHealthy(): Promise<boolean> {
     // Mock provider is always healthy
     return true;
+  }
+
+  // Source text operations
+  async getSourceTexts(
+    query: SourceTextQuery
+  ): Promise<SourceTextListResponse> {
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    // Sort the data
+    const sorted = [...mockSourceTexts].sort((a, b) => {
+      const aValue = a.createdAt;
+      const bValue = b.createdAt;
+
+      return query.order === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    });
+
+    // Apply pagination
+    const startIndex = (query.page - 1) * query.perPage;
+    const endIndex = startIndex + query.perPage;
+    const paginatedData = sorted.slice(startIndex, endIndex);
+
+    return {
+      data: paginatedData,
+      meta: {
+        pagination: {
+          total: sorted.length,
+          page: query.page,
+          perPage: query.perPage,
+        },
+      },
+    };
+  }
+
+  async getSourceTextById(
+    id: string
+  ): Promise<SourceTextWithFlashcardsResponse | null> {
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    return getMockSourceTextById(id);
+  }
+
+  async createSourceText(
+    data: SourceTextCreateData
+  ): Promise<SourceTextResponse> {
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const newId = `text-${Date.now()}`;
+    const now = new Date().toISOString();
+
+    const newText: SourceTextResponse = {
+      id: newId,
+      textContent: data.textContent,
+      createdAt: now,
+    };
+
+    addMockSourceText(newText);
+    return newText;
+  }
+
+  async updateSourceText(
+    id: string,
+    data: Partial<SourceTextCreateData>
+  ): Promise<SourceTextResponse | null> {
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    return updateMockSourceText(id, data);
+  }
+
+  async deleteSourceText(id: string): Promise<boolean> {
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    return deleteMockSourceText(id);
+  }
+
+  async getEventLogs(query: EventLogQuery): Promise<EventLogsResponse> {
+    // Simulate async operation
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    const { data: eventLogs, total } = getMockEventLogs(
+      query.page || 1,
+      query.perPage || 20,
+      query.eventType,
+      query.severity,
+      query.startDate,
+      query.endDate
+    );
+
+    const summary = getEventLogSummary();
+
+    return {
+      data: eventLogs,
+      meta: {
+        pagination: {
+          total,
+          page: query.page || 1,
+          perPage: query.perPage || 20,
+        },
+        summary,
+      },
+    };
   }
 }

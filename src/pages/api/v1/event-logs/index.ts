@@ -1,9 +1,5 @@
 import type { APIRoute } from "astro";
-import {
-  getEventLogSummary,
-  getMockEventLogs,
-} from "../../../../lib/data/mock-event-log-store";
-import type { EventLogsResponse } from "./types";
+import { DataProviderFactory } from "../../../../lib/data/provider-factory";
 import { validateEventLogQuery } from "./validation";
 
 // Wymagane dla endpointów API w Astro
@@ -19,33 +15,20 @@ export const GET: APIRoute = async ({ request, url }) => {
     const queryParams = Object.fromEntries(url.searchParams.entries());
     const validatedQuery = validateEventLogQuery(queryParams);
 
-    // For now, use a default user ID (will be replaced with auth later)
-    const userId = "default-user-id";
+    // Get data provider
+    const provider = DataProviderFactory.getProvider();
 
-    // Use mock data with filtering and pagination from global store
-    const { data: eventLogs, total } = getMockEventLogs(
-      validatedQuery.page,
-      validatedQuery.perPage,
-      validatedQuery.eventType,
-      validatedQuery.severity,
-      validatedQuery.startDate,
-      validatedQuery.endDate
-    );
+    // Get event logs from provider
+    const eventLogsResponse = await provider.getEventLogs({
+      page: validatedQuery.page,
+      perPage: validatedQuery.perPage,
+      eventType: validatedQuery.eventType,
+      severity: validatedQuery.severity,
+      startDate: validatedQuery.startDate,
+      endDate: validatedQuery.endDate,
+    });
 
-    // Get summary statistics from global store
-    const summary = getEventLogSummary();
-
-    const response: EventLogsResponse = {
-      data: eventLogs,
-      meta: {
-        pagination: {
-          total,
-          page: validatedQuery.page,
-          perPage: validatedQuery.perPage,
-        },
-        summary,
-      },
-    };
+    const response = eventLogsResponse;
 
     return new Response(JSON.stringify(response), {
       status: 200,

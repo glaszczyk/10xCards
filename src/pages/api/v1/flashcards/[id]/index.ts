@@ -1,9 +1,5 @@
 import type { APIRoute } from "astro";
-import {
-  deleteMockFlashcard,
-  getMockFlashcardById,
-  updateMockFlashcard,
-} from "../../../../lib/data/mock-flashcard-store";
+import { DataProviderFactory } from "../../../../../lib/data/provider-factory";
 import type {
   ApiResponse,
   FlashcardDetailResponse,
@@ -22,8 +18,13 @@ export const GET: APIRoute = async ({ params }) => {
     const { id } = FlashcardIdParamSchema.parse(params);
     console.log("✅ Validation passed, searching for ID:", id);
 
-    // Pobierz fiszkę po id z globalnego store
-    const card = getMockFlashcardById(id);
+    // Get the appropriate data provider
+    const provider = DataProviderFactory.getProvider();
+    const providerType = DataProviderFactory.getCurrentProviderType();
+    console.log(`Using data provider: ${providerType}`);
+
+    // Pobierz fiszkę po id z providera
+    const card = await provider.getFlashcardById(id);
     if (!card) {
       console.log("❌ Flashcard not found");
       return new Response(
@@ -44,15 +45,45 @@ export const GET: APIRoute = async ({ params }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.log("❌ Validation error:", error);
+    console.log("❌ Error:", error);
+
+    // Handle validation errors
+    if (error instanceof Error && error.message.includes("validation")) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Invalid id parameter",
+            details: error.message,
+          },
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Handle database connection errors
+    if (error instanceof Error && error.message.includes("Database error")) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "DATABASE_ERROR",
+            message: "Database connection failed",
+            details: error.message,
+          },
+        }),
+        { status: 503, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Handle other errors
     return new Response(
       JSON.stringify({
         error: {
-          code: "INVALID_UUID",
-          message: error instanceof Error ? error.message : "Invalid id",
+          code: "INTERNAL_ERROR",
+          message: "Failed to fetch flashcard",
         },
       }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
@@ -70,8 +101,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     const body = await request.json();
     const validatedUpdates = UpdateFlashcardSchema.parse(body);
 
-    // Aktualizuj fiszkę w globalnym store
-    const updatedCard = updateMockFlashcard(id, validatedUpdates);
+    // Get the appropriate data provider
+    const provider = DataProviderFactory.getProvider();
+    const providerType = DataProviderFactory.getCurrentProviderType();
+    console.log(`Using data provider: ${providerType}`);
+
+    // Aktualizuj fiszkę w providerze
+    const updatedCard = await provider.updateFlashcard(id, validatedUpdates);
     if (!updatedCard) {
       return new Response(
         JSON.stringify({
@@ -106,6 +142,20 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       );
     }
 
+    // Handle database connection errors
+    if (error instanceof Error && error.message.includes("Database error")) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "DATABASE_ERROR",
+            message: "Database connection failed",
+            details: error.message,
+          },
+        }),
+        { status: 503, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     // Handle other errors
     return new Response(
       JSON.stringify({
@@ -128,8 +178,13 @@ export const DELETE: APIRoute = async ({ params }) => {
     // Walidacja parametru id
     const { id } = FlashcardIdParamSchema.parse(params);
 
-    // Usuń fiszkę z globalnego store
-    const deleted = deleteMockFlashcard(id);
+    // Get the appropriate data provider
+    const provider = DataProviderFactory.getProvider();
+    const providerType = DataProviderFactory.getCurrentProviderType();
+    console.log(`Using data provider: ${providerType}`);
+
+    // Usuń fiszkę z providera
+    const deleted = await provider.deleteFlashcard(id);
     if (!deleted) {
       return new Response(
         JSON.stringify({
@@ -147,14 +202,43 @@ export const DELETE: APIRoute = async ({ params }) => {
   } catch (error) {
     console.error("Error deleting flashcard:", error);
 
+    // Handle validation errors
+    if (error instanceof Error && error.message.includes("validation")) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Invalid id parameter",
+            details: error.message,
+          },
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Handle database connection errors
+    if (error instanceof Error && error.message.includes("Database error")) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "DATABASE_ERROR",
+            message: "Database connection failed",
+            details: error.message,
+          },
+        }),
+        { status: 503, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Handle other errors
     return new Response(
       JSON.stringify({
         error: {
-          code: "INVALID_UUID",
-          message: error instanceof Error ? error.message : "Invalid id",
+          code: "INTERNAL_ERROR",
+          message: "Failed to delete flashcard",
         },
       }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
