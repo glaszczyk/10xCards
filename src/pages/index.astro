@@ -1,42 +1,11 @@
 ---
+import { Header } from "@/components/shared/Header";
 import AppLayout from "@/layouts/AppLayout.astro";
 ---
 
 <AppLayout title="10xCards - AI-Powered Flashcard Learning">
   <div class="min-h-screen bg-background">
-    <!-- Header -->
-    <header class="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50">
-      <div class="container flex h-16 items-center justify-between px-4">
-        <!-- Logo/Brand -->
-        <div class="flex items-center space-x-4">
-          <a href="/" class="flex items-center space-x-2">
-            <div class="h-6 w-6 rounded bg-primary flex items-center justify-center">
-              <span class="text-primary-foreground text-sm font-bold">10x</span>
-            </div>
-            <span class="hidden sm:inline font-semibold text-lg">Cards</span>
-          </a>
-        </div>
-
-        <!-- Navigation -->
-        <nav class="flex items-center space-x-1">
-          <a href="/generate" class="rounded-md transition-colors">
-            <button class="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
-              <span>Generate</span>
-            </button>
-          </a>
-          <a href="/learn" class="rounded-md transition-colors">
-            <button class="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
-              <span>Learn</span>
-            </button>
-          </a>
-          <a href="/manage" class="rounded-md transition-colors">
-            <button class="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
-              <span>Manage</span>
-            </button>
-          </a>
-        </nav>
-      </div>
-    </header>
+    <Header client:load currentPage="home" />
 
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-6">
@@ -64,7 +33,9 @@ import AppLayout from "@/layouts/AppLayout.astro";
           </div>
           <div class="p-6 border rounded-lg text-center">
             <h3 class="text-lg font-semibold mb-2">Manage</h3>
-            <p class="text-muted-foreground">Organize and edit your flashcards</p>
+            <p class="text-muted-foreground">
+              Organize and edit your flashcards
+            </p>
           </div>
         </div>
       </div>

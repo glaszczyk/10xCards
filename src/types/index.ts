@@ -16,9 +16,7 @@ export type SourceTextRow = Tables["source_texts"]["Row"];
 export type EventLogRow = Tables["event_logs"]["Row"];
 
 // Extended types for UI components
-export interface Flashcard extends Omit<FlashcardRow, "source"> {
-  source?: "ai" | "manual" | "ai-edited";
-}
+export type { Flashcard } from "@/common/types";
 
 export interface FlashcardForReview extends Flashcard {
   isReviewTime: boolean;
