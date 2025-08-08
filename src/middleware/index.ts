@@ -10,6 +10,7 @@ const publicPaths = [
   "/auth",
   "/generate",
   "/learn",
+  "/manage",
 ];
 
 export const onRequest = defineMiddleware(
