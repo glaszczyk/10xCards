@@ -1,0 +1,39 @@
+---
+import { MainLayout } from "@/components/shared/MainLayout";
+import AppLayout from "@/layouts/AppLayout.astro";
+---
+
+<AppLayout title="Test Page - 10xCards">
+  <MainLayout client:load currentPath="/test">
+    <div class="space-y-6">
+      <h1 class="text-3xl font-bold">Test Page</h1>
+
+      <div class="grid gap-4">
+        <div class="p-4 border rounded-lg">
+          <h2 class="text-xl font-semibold mb-2">Infrastructure Test</h2>
+          <p class="text-muted-foreground">
+            This page tests the basic infrastructure including:
+          </p>
+          <ul class="list-disc list-inside mt-2 space-y-1 text-sm">
+            <li>✅ MainLayout with AuthProvider</li>
+            <li>✅ Navigation component</li>
+            <li>✅ UserMenu component</li>
+            <li>✅ ErrorBoundary wrapper</li>
+            <li>✅ Toast notification system</li>
+            <li>✅ Tailwind CSS styling</li>
+            <li>✅ shadcn/ui components</li>
+          </ul>
+        </div>
+
+        <div class="p-4 border rounded-lg">
+          <h2 class="text-xl font-semibold mb-2">Current Status</h2>
+          <p class="text-muted-foreground">
+            You should see the navigation bar at the top with Generate, Learn,
+            and Manage links. The UserMenu should show authentication status.
+          </p>
+        </div>
+      </div>
+    </div>
+  </MainLayout>
+</AppLayout>
+

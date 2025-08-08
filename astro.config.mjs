@@ -6,7 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  output: "server", // Dodane: włącz tryb server dla API
+  output: "static", // Zmienione na static dla testowania
   vite: {
     plugins: [tailwindcss()],
   },
