@@ -504,6 +504,174 @@ Po ukończeniu Bloku 1 mamy:
 
 ---
 
+## **BLOK 2: Moduł Uwierzytelniania** 🔄 **W TRAKCIE**
+
+### **Krok 4: Strony uwierzytelniania (Login/Register)** ✅
+
+**Cel**: Implementacja stron logowania i rejestracji z UI
+
+**Zadania**:
+
+1. ✅ Implementacja `/auth/login` strony z formularzem
+2. ✅ Implementacja `/auth/register` strony z formularzem
+3. ✅ Walidacja formularzy (email, hasło, potwierdzenie hasła)
+4. ✅ Obsługa stanów loading i błędów w UI
+5. ✅ Responsive design dla mobile/desktop
+
+**Pliki do utworzenia**:
+
+- ✅ `src/pages/auth/login.astro` - strona logowania
+- ✅ `src/pages/auth/register.astro` - strona rejestracji
+- ✅ `src/components/auth/LoginForm.tsx` - formularz logowania
+- ✅ `src/components/auth/RegisterForm.tsx` - formularz rejestracji
+- ✅ `src/components/auth/AuthCard.tsx` - wrapper dla formularzy
+- ✅ `src/components/auth/AuthLayout.tsx` - layout dla stron auth
+
+**Wymagania**:
+
+- ✅ Formularze z walidacją inline
+- ✅ Obsługa stanów loading/error/success
+- ✅ Responsive design
+- ✅ Integracja z istniejącym systemem błędów i toast
+
+**Rozwiązane problemy**:
+
+- ✅ Naprawiono błąd importu `ReactNode` z React
+- ✅ Naprawiono routing - dodano `/login` przekierowanie na `/auth/login`
+- ✅ Naprawiono middleware - dodano `/auth` do publicPaths
+- ✅ Naprawiono błędy składni HTML w Astro
+
+### **Krok 5: Komponenty formularzy uwierzytelniania** ✅
+
+**Cel**: Reusable komponenty formularzy z walidacją
+
+**Zadania**:
+
+1. ✅ Implementacja `LoginForm` z polami email/hasło
+2. ✅ Implementacja `RegisterForm` z polami email/hasło/potwierdzenie
+3. ✅ Walidacja real-time z wyświetlaniem błędów
+4. ✅ Integracja z shadcn/ui komponentami
+5. ✅ Obsługa stanów formularza
+
+**Komponenty shadcn/ui potrzebne**:
+
+- ✅ `Form`, `FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormMessage`
+- ✅ `Input` (już zainstalowany)
+- ✅ `Button` (już zainstalowany)
+- ✅ `Label` (już zainstalowany)
+- ✅ `Alert` (już zainstalowany)
+
+**Rozwiązane problemy**:
+
+- ✅ Naprawiono błąd `useToast` - usunięto na razie z formularzy
+- ✅ Naprawiono walidację - wszystkie błędy nad formularzem
+- ✅ Dodano `noValidate` do formularzy
+- ✅ Usunięto natywną walidację HTML (`type="email"`, `required`)
+- ✅ Dodano spójne podpowiedzi pod polami
+
+### **Krok 6: Integracja i testowanie uwierzytelniania** ✅
+
+**Cel**: Połączenie wszystkich komponentów i testowanie UI
+
+**Zadania**:
+
+1. ✅ Testowanie responsywności
+2. ✅ Testowanie walidacji formularzy
+3. ✅ Testowanie obsługi błędów
+4. ✅ Testowanie linków między stronami
+5. ✅ Przygotowanie do przyszłej integracji z backend
+
+**Wymagania**:
+
+- ✅ Działające formularze z walidacją
+- ✅ Responsive design na wszystkich urządzeniach
+- ✅ Obsługa błędów i loading states
+- ✅ Gotowość do integracji z Supabase Auth
+
+**Rozwiązane problemy**:
+
+- ✅ Naprawiono routing - `/login` → `/auth/login`
+- ✅ Naprawiono middleware - dodano `/auth` do publicPaths
+- ✅ Spójna walidacja - wszystkie błędy nad formularzem
+- ✅ Dodano podpowiedzi pod polami
+- ✅ Testowano responsywność i linki
+
+---
+
+### **Podsumowanie Bloku 2**
+
+Po ukończeniu Bloku 2 mamy:
+
+- ✅ Strony logowania i rejestracji z UI
+- ✅ Formularze z walidacją real-time
+- ✅ Responsive design
+- ✅ Integracja z systemem błędów
+- ✅ Gotowość do integracji z backend
+
+**Stan aplikacji**: Kompletny UI uwierzytelniania gotowy do integracji z backend.
+
+**Uwaga**: Logika backend (Supabase Auth) będzie implementowana w przyszłości na podstawie tego UI.
+
+**Architektura**: Astro (strony) + React (formularze) + shadcn/ui (komponenty)
+
+---
+
+## **BLOK 3: Moduł Generowania** ⏳ **NASTĘPNY**
+
+### **Krok 7: Strona generowania fiszek** ⏳
+
+**Cel**: Implementacja głównej strony do generowania fiszek z AI
+
+**Zadania**:
+
+1. Implementacja `/generate` strony
+2. Formularz z tekstem źródłowym
+3. Integracja z OpenRouter AI
+4. Podgląd wygenerowanych fiszek
+5. Responsive design
+
+**Pliki do utworzenia**:
+
+- `src/pages/generate.astro` - główna strona generowania
+- `src/components/generate/GenerateForm.tsx` - formularz generowania
+- `src/components/generate/FlashcardPreview.tsx` - podgląd fiszek
+- `src/components/generate/GenerateLayout.tsx` - layout dla generowania
+- `src/lib/ai.ts` - integracja z OpenRouter
+
+**Wymagania**:
+
+- Formularz z textarea dla tekstu źródłowego
+- Opcje generowania (liczba fiszek, typ)
+- Loading state podczas generowania
+- Podgląd wygenerowanych fiszek
+- Możliwość edycji przed zapisaniem
+
+### **Krok 8: Integracja z AI** ⏳
+
+**Cel**: Połączenie z OpenRouter AI do generowania fiszek
+
+**Zadania**:
+
+1. Implementacja `ai.ts` z OpenRouter API
+2. Prompt engineering dla generowania fiszek
+3. Obsługa błędów API
+4. Rate limiting i retry logic
+5. Testowanie z różnymi tekstami
+
+### **Krok 9: Podgląd i edycja fiszek** ⏳
+
+**Cel**: Możliwość podglądu i edycji wygenerowanych fiszek
+
+**Zadania**:
+
+1. Komponent podglądu fiszek
+2. Edycja inline (pytanie/odpowiedź)
+3. Dodawanie/usuwanie fiszek
+4. Zapisywanie do bazy danych
+5. Przejście do nauki
+
+---
+
 ## **WAŻNE UWAGI TECHNICZNE**
 
 ### **Tailwind CSS 4 Konfiguracja**

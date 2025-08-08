@@ -1,0 +1,28 @@
+---
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { AuthCard } from "@/components/auth/AuthCard";
+import { RegisterForm } from "@/components/auth/RegisterForm";
+import AppLayout from "@/layouts/AppLayout.astro";
+---
+
+<AppLayout title="Sign Up - 10xCards">
+  <AuthLayout 
+    client:load
+    title="Create your account"
+    subtitle="Join 10xCards to start learning with AI-powered flashcards"
+  >
+    <AuthCard 
+      client:load
+      title="Sign Up"
+      description="Create your account to get started"
+    >
+      <RegisterForm 
+        client:load
+        onSuccess={() => {
+          // TODO: Na przyszłość - przekierowanie do /generate
+          console.log("Registration successful - redirect to /generate");
+        }}
+      />
+    </AuthCard>
+  </AuthLayout>
+</AppLayout> 
