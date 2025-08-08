@@ -72,10 +72,12 @@ export function GeneratePage() {
   const handleBack = () => {
     setPageState("form");
     setGeneratedFlashcards([]);
+    setSourceText(""); // Clear source text when going back
   };
 
   const handleCreateManual = () => {
     setPageState("manual");
+    setSourceText(""); // Clear source text when switching to manual mode
   };
 
   const handleGenerateAI = () => {
@@ -100,7 +102,7 @@ export function GeneratePage() {
         onSave={handleSave}
         onBack={handleBack}
         onGenerateAI={handleGenerateAI}
-        sourceText={sourceText}
+        sourceText={undefined} // Don't show source text in manual mode
         isSaving={isSaving}
       />
     );
