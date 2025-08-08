@@ -1,12 +1,53 @@
 ---
-import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
-import "../styles/global.css";
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import { Header } from "@/components/shared/Header";
+import AppLayout from "@/layouts/AppLayout.astro";
 ---
 
-<Layout>
-  <Welcome />
-</Layout>
+<AppLayout title="10xCards - AI-Powered Flashcard Learning">
+  <div class="min-h-screen bg-background">
+    <Header client:load currentPage="home" />
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+      <div class="space-y-6">
+        <div class="text-center space-y-4">
+          <h1 class="text-4xl font-bold">Welcome to 10xCards</h1>
+          <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Create and learn with AI-generated flashcards. Boost your learning
+            with spaced repetition and intelligent content generation.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div class="p-6 border rounded-lg text-center">
+            <h3 class="text-lg font-semibold mb-2">Generate</h3>
+            <p class="text-muted-foreground">
+              Create flashcards from any text using AI
+            </p>
+          </div>
+          <div class="p-6 border rounded-lg text-center">
+            <h3 class="text-lg font-semibold mb-2">Learn</h3>
+            <p class="text-muted-foreground">
+              Study with spaced repetition algorithm
+            </p>
+          </div>
+          <div class="p-6 border rounded-lg text-center">
+            <h3 class="text-lg font-semibold mb-2">Manage</h3>
+            <p class="text-muted-foreground">
+              Organize and edit your flashcards
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t bg-card/50 mt-auto">
+      <div class="container mx-auto px-4 py-4">
+        <div class="text-center text-sm text-muted-foreground">
+          <p>&copy; 2024 10xCards. AI-powered flashcard learning platform.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</AppLayout>

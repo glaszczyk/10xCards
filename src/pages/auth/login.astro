@@ -1,0 +1,28 @@
+---
+import { AuthCard } from "@/components/auth/AuthCard";
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { LoginForm } from "@/components/auth/LoginForm";
+import AppLayout from "@/layouts/AppLayout.astro";
+---
+
+<AppLayout title="Sign In - 10xCards">
+  <AuthLayout
+    client:load
+    title="Welcome back"
+    subtitle="Sign in to your account to continue learning"
+  >
+    <AuthCard
+      client:load
+      title="Sign In"
+      description="Enter your credentials to access your account"
+    >
+      <LoginForm
+        client:load
+        onSuccess={() => {
+          // TODO: Na przyszłość - przekierowanie do /generate
+          console.log("Login successful - redirect to /generate");
+        }}
+      />
+    </AuthCard>
+  </AuthLayout>
+</AppLayout>

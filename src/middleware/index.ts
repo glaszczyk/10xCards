@@ -1,7 +1,17 @@
 import { defineMiddleware } from "astro:middleware";
 import { supabaseClient } from "../db/supabase.client";
 
-const publicPaths = ["/", "/login", "/register", "/about", "/api"];
+const publicPaths = [
+  "/",
+  "/login",
+  "/register",
+  "/about",
+  "/api",
+  "/auth",
+  "/generate",
+  "/learn",
+  "/manage",
+];
 
 export const onRequest = defineMiddleware(
   async (

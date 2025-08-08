@@ -6,28 +6,18 @@
 echo "🔄 Running 10xCards database migrations..."
 echo "=========================================="
 
-# Sprawdź czy Supabase CLI jest dostępne
-if ! command -v supabase &> /dev/null; then
-    echo "❌ Supabase CLI is not installed or not in PATH"
-    echo "Please install Supabase CLI first:"
-    echo "  npm install -g supabase"
-    echo "  or"
-    echo "  brew install supabase/tap/supabase"
-    exit 1
-fi
-
 # Sprawdź status Supabase
 echo "📊 Checking Supabase status..."
-supabase status
+npx supabase status
 
 if [ $? -ne 0 ]; then
     echo "❌ Supabase is not running. Starting Supabase..."
-    supabase start
+    npx supabase start
 fi
 
 # Uruchom migracje
 echo "🚀 Running migrations..."
-supabase db reset
+npx supabase db reset
 
 echo "✅ Migration completed successfully!"
 echo ""
