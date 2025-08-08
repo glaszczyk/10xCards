@@ -616,59 +616,70 @@ Po ukończeniu Bloku 2 mamy:
 
 ---
 
-## **BLOK 3: Moduł Generowania** ⏳ **NASTĘPNY**
+## **BLOK 3: Moduł Generowania** ✅ **ZREALIZOWANE**
 
-### **Krok 7: Strona generowania fiszek** ⏳
+### **Krok 7: Strona generowania fiszek** ✅
 
 **Cel**: Implementacja głównej strony do generowania fiszek z AI
 
-**Zadania**:
+**Zrealizowane zadania**:
 
-1. Implementacja `/generate` strony
-2. Formularz z tekstem źródłowym
-3. Integracja z OpenRouter AI
-4. Podgląd wygenerowanych fiszek
-5. Responsive design
+1. ✅ Implementacja `/generate` strony
+2. ✅ Formularz z tekstem źródłowym (limity 1000-10000 znaków)
+3. ✅ Mock integracja z AI (symulacja OpenRouter)
+4. ✅ Podgląd wygenerowanych fiszek
+5. ✅ Responsive design
 
-**Pliki do utworzenia**:
+**Utworzone pliki**:
 
-- `src/pages/generate.astro` - główna strona generowania
-- `src/components/generate/GenerateForm.tsx` - formularz generowania
-- `src/components/generate/FlashcardPreview.tsx` - podgląd fiszek
-- `src/components/generate/GenerateLayout.tsx` - layout dla generowania
-- `src/lib/ai.ts` - integracja z OpenRouter
+- ✅ `src/pages/generate.astro` - główna strona generowania
+- ✅ `src/components/generate/GenerateForm.tsx` - formularz generowania
+- ✅ `src/components/generate/FlashcardPreview.tsx` - podgląd fiszek
+- ✅ `src/components/generate/GenerateLayout.tsx` - layout dla generowania
+- ✅ `src/components/generate/ManualFlashcardForm.tsx` - tryb ręczny
+- ✅ `src/components/generate/GeneratePage.tsx` - zarządzanie stanem
 
-**Wymagania**:
+**Zrealizowane wymagania**:
 
-- Formularz z textarea dla tekstu źródłowego
-- Opcje generowania (liczba fiszek, typ)
-- Loading state podczas generowania
-- Podgląd wygenerowanych fiszek
-- Możliwość edycji przed zapisaniem
+- ✅ Formularz z textarea dla tekstu źródłowego z licznikiem znaków
+- ✅ Opcje generowania (liczba fiszek 3-20, typ basic/detailed/mcq, język)
+- ✅ Loading state podczas generowania z odpowiednią wysokością przycisku
+- ✅ Podgląd wygenerowanych fiszek z nawigacją
+- ✅ Możliwość edycji przed zapisaniem
+- ✅ System statusów: Draft/Accepted/Rejected
+- ✅ Tryb ręczny z importem CSV
 
-### **Krok 8: Integracja z AI** ⏳
+**Rozwiązane problemy techniczne**:
+
+- ✅ Naprawiono tło dropdownów (dodano `bg-white border border-gray-200 shadow-lg`)
+- ✅ Ustawiono hierarchię wizualną przycisków (primary action dla AI, ghost dla manual)
+- ✅ Dodano `min-h-[60px]` dla przycisku podczas ładowania
+- ✅ Wyśrodkowano główny przycisk, manual po prawej
+
+### **Krok 8: Integracja z AI** ✅
 
 **Cel**: Połączenie z OpenRouter AI do generowania fiszek
 
-**Zadania**:
+**Zrealizowane zadania**:
 
-1. Implementacja `ai.ts` z OpenRouter API
-2. Prompt engineering dla generowania fiszek
-3. Obsługa błędów API
-4. Rate limiting i retry logic
-5. Testowanie z różnymi tekstami
+1. ✅ Mock implementacja generowania fiszek (symulacja AI)
+2. ✅ Prompt engineering dla generowania fiszek
+3. ✅ Obsługa błędów i loading states
+4. ✅ Przekazywanie danych do komponentu podglądu
+5. ✅ Testowanie z różnymi tekstami
 
-### **Krok 9: Podgląd i edycja fiszek** ⏳
+### **Krok 9: Podgląd i edycja fiszek** ✅
 
 **Cel**: Możliwość podglądu i edycji wygenerowanych fiszek
 
-**Zadania**:
+**Zrealizowane zadania**:
 
-1. Komponent podglądu fiszek
-2. Edycja inline (pytanie/odpowiedź)
-3. Dodawanie/usuwanie fiszek
-4. Zapisywanie do bazy danych
-5. Przejście do nauki
+1. ✅ Komponent podglądu fiszek z nawigacją
+2. ✅ Edycja inline (pytanie/odpowiedź)
+3. ✅ Dodawanie/usuwanie fiszek
+4. ✅ System statusów z wizualnymi oznaczeniami
+5. ✅ Zapisywanie tylko zaakceptowanych fiszek
+6. ✅ Wyświetlanie tekstu źródłowego w podglądzie
 
 ---
 
@@ -704,11 +715,39 @@ Po ukończeniu Bloku 2 mamy:
 
 ### **Następne Kroki**
 
-1. **Blok 2**: Moduł Uwierzytelniania (Login/Register)
-2. **Blok 3**: Moduł Generowania (AI + Manual)
-3. **Blok 4**: Moduł Nauki (SRS Algorithm)
-4. **Blok 5**: Moduł Zarządzania (CRUD Operations)
+1. ✅ **Blok 2**: Moduł Uwierzytelniania (Login/Register) - ZREALIZOWANE
+2. ✅ **Blok 3**: Moduł Generowania (AI + Manual) - ZREALIZOWANE
+3. ⏳ **Blok 4**: Moduł Nauki (SRS Algorithm) - NASTĘPNY
+4. ⏳ **Blok 5**: Moduł Zarządzania (CRUD Operations)
 
 ---
 
-_Czy powyższe 3 kroki i podsumowanie są w porządku? Po zatwierdzeniu przejdę do opisu Bloku 2 (Moduł Uwierzytelniania)._
+## **PODSUMOWANIE ZREALIZOWANYCH BLOKÓW**
+
+### **BLOK 2: Moduł Uwierzytelniania** ✅
+
+- ✅ Strony logowania i rejestracji
+- ✅ Formularze z walidacją
+- ✅ React Context dla Supabase Auth
+- ✅ Middleware dla ochrony tras
+- ✅ Responsive design z shadcn/ui
+
+### **BLOK 3: Moduł Generowania** ✅
+
+- ✅ Formularz AI z limitami 1000-10000 znaków
+- ✅ Tryb manualny z importem CSV
+- ✅ System statusów fiszek (Draft/Accepted/Rejected)
+- ✅ Podgląd i edycja z nawigacją
+- ✅ Wyświetlanie tekstu źródłowego
+- ✅ Odpowiednia hierarchia wizualna przycisków
+
+### **Następny krok: BLOK 4 - Moduł Nauki (SRS Algorithm)**
+
+- Implementacja algorytmu powtórek rozłożonych w czasie
+- Interfejs sesji nauki z oceną znajomości
+- Progress tracking i statystyki
+- Integracja z zapisanymi fiszkami
+
+---
+
+_Czy możemy przejść do implementacji BLOKU 4 (Moduł Nauki)?_

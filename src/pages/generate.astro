@@ -1,0 +1,16 @@
+---
+import { GenerateLayout } from "@/components/generate/GenerateLayout";
+import { GeneratePage } from "@/components/generate/GeneratePage";
+import AppLayout from "@/layouts/AppLayout.astro";
+---
+
+<AppLayout title="Generate Flashcards - 10xCards">
+  <GenerateLayout
+    client:load
+    title="Generate Flashcards"
+    subtitle="Create flashcards from any text using AI"
+  >
+    <GeneratePage client:load />
+  </GenerateLayout>
+</AppLayout>
+
