@@ -126,13 +126,25 @@ export function requireAuth(user: User | null): User {
   return user;
 }
 
-// Magic Link authentication
-export async function signInWithMagicLink(email: string) {
+// OTP (One-Time Password) authentication
+export async function signInWithOtp(email: string) {
   const { data, error } = await supabaseClient.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${window.location.origin}/auth/callback`,
+      shouldCreateUser: true, // Automatycznie utwórz użytkownika jeśli nie istnieje
     },
+  });
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+// Verify OTP code
+export async function verifyOtp(email: string, token: string) {
+  const { data, error } = await supabaseClient.auth.verifyOtp({
+    email,
+    token,
+    type: 'magiclink',
   });
 
   if (error) throw new Error(error.message);

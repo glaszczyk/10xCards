@@ -10,6 +10,7 @@ const publicPaths = [
   "/auth/callback",
   "/api",
   "/about",
+  "/generate", // Add generate to public paths
 ];
 
 // Dodaj funkcję sprawdzającą ścieżki auth
@@ -36,9 +37,43 @@ export const onRequest = defineMiddleware(
     (locals as any).user = null;
     (locals as any).session = null;
 
+    // Get cookies from request
+    const cookies = request.headers.get("cookie");
+    console.log("Middleware - Cookies:", cookies);
+
+    // Parse cookies to see what we have
+    if (cookies) {
+      const cookieArray = cookies.split(";").map((c) => c.trim());
+      console.log("Middleware - Parsed cookies:", cookieArray);
+
+      // Check for Supabase specific cookies
+      const supabaseCookies = cookieArray.filter(
+        (c) => c.startsWith("sb-") || c.startsWith("supabase-auth-token")
+      );
+      console.log("Middleware - Supabase cookies:", supabaseCookies);
+    }
+
+    // Check for Supabase auth cookies instead of getSession()
+    const hasAuthCookie =
+      cookies &&
+      (cookies.includes("sb-") || cookies.includes("supabase-auth-token"));
+
+    console.log("Middleware - hasAuthCookie result:", hasAuthCookie);
+
+    // Try to get session, but don't rely on it for middleware
     const {
       data: { session },
     } = await supabaseClient.auth.getSession();
+
+    // Debug: log session info
+    console.log("Middleware - Session check:", {
+      hasSession: !!session,
+      hasAuthCookie: hasAuthCookie,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email,
+      pathname: new URL(request.url).pathname,
+      cookies: cookies,
+    });
 
     if (session) {
       (locals as any).user = session.user;
@@ -48,14 +83,13 @@ export const onRequest = defineMiddleware(
     const url = new URL(request.url);
     const pathname = url.pathname;
 
-    // Jeśli użytkownik jest zalogowany i próbuje wejść na stronę auth
-    if (session && isAuthPath(pathname)) {
-      return redirect("/generate");
-    }
+    // Tymczasowo wyłączamy middleware dla chronionych tras
+    // Pozwalamy na dostęp do wszystkich tras, a autoryzację obsługuje MainLayout
+    console.log("Middleware - Allowing access to:", pathname);
 
-    // Jeśli użytkownik nie jest zalogowany i próbuje wejść na chronioną trasę
-    if (!session && !isPublicPath(pathname)) {
-      return redirect(`/auth/login?redirectTo=${encodeURIComponent(pathname)}`);
+    // Jeśli użytkownik ma cookie auth i próbuje wejść na stronę auth
+    if (hasAuthCookie && isAuthPath(pathname)) {
+      return redirect("/generate");
     }
 
     return next();

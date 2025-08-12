@@ -1,14 +1,24 @@
 ---
 import { ManagePage } from "@/components/manage/ManagePage";
-import { Header } from "@/components/shared/Header";
+import { MainLayout } from "@/components/shared/MainLayout";
 import AppLayout from "@/layouts/AppLayout.astro";
 ---
 
 <AppLayout title="Zarządzanie fiszkami - 10xCards">
-  <div class="min-h-screen bg-background">
-    <Header client:load currentPage="manage" />
-    <div class="container mx-auto px-4 py-8">
-      <ManagePage client:load />
+  <MainLayout client:load currentPath="/manage" showAuthRequired={true}>
+    <div class="space-y-6">
+      <div class="text-center">
+        <h1 class="text-3xl font-bold tracking-tight mb-2">
+          Zarządzanie fiszkami
+        </h1>
+        <p class="text-muted-foreground text-lg">
+          Organizuj i edytuj swoje fiszki
+        </p>
+      </div>
+
+      <div class="max-w-6xl mx-auto">
+        <ManagePage client:load />
+      </div>
     </div>
-  </div>
+  </MainLayout>
 </AppLayout>

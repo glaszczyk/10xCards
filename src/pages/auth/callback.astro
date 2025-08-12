@@ -1,0 +1,94 @@
+---
+// Callback page for Magic Link authentication
+import { supabaseClient } from "@/db/supabase.client";
+
+// Handle the callback from Supabase
+const { searchParams } = Astro.url;
+const token_hash = searchParams.get("token_hash") || searchParams.get("token");
+const type = searchParams.get("type");
+
+// Debug: log all search params
+console.log(
+  "Callback search params:",
+  Object.fromEntries(searchParams.entries())
+);
+console.log("Token hash:", token_hash);
+console.log("Type:", type);
+
+// If we have a token, try to verify it directly
+if (token_hash && type) {
+  try {
+    if (type === "recovery") {
+      // Password reset callback
+      const { error } = await supabaseClient.auth.verifyOtp({
+        token_hash,
+        type: "recovery",
+      });
+
+      if (error) {
+        console.error("Password reset error:", error);
+        return Astro.redirect("/auth/login?error=reset_failed");
+      }
+
+      // Redirect to password reset page
+      return Astro.redirect("/auth/reset-password");
+    } else {
+      // Magic link callback
+      try {
+        // Try to verify OTP first
+        const { error: otpError } = await supabaseClient.auth.verifyOtp({
+          token_hash,
+          type: "magiclink",
+        });
+
+        if (otpError) {
+          console.error("OTP verification error:", otpError);
+
+          // If OTP fails, try to get session directly
+          const {
+            data: { session },
+            error: sessionError,
+          } = await supabaseClient.auth.getSession();
+
+          if (sessionError || !session) {
+            console.error("Session error:", sessionError);
+            return Astro.redirect("/auth/login?error=magiclink_failed");
+          }
+        }
+
+        // Successfully authenticated, redirect to main page
+        return Astro.redirect("/generate");
+      } catch (error) {
+        console.error("Magic link verification error:", error);
+        return Astro.redirect("/auth/login?error=magiclink_failed");
+      }
+    }
+  } catch (error) {
+    console.error("Callback error:", error);
+    return Astro.redirect("/auth/login?error=callback_failed");
+  }
+}
+
+// If no token, redirect to login
+return Astro.redirect("/auth/login");
+---
+
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weryfikacja - 10xCards</title>
+  </head>
+  <body>
+    <div class="min-h-screen flex items-center justify-center bg-gray-50">
+      <div class="max-w-md w-full space-y-8">
+        <div class="text-center">
+          <h2 class="text-3xl font-bold text-gray-900">Weryfikacja...</h2>
+          <p class="mt-2 text-sm text-gray-600">
+            Przetwarzanie weryfikacji, proszę czekać...
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

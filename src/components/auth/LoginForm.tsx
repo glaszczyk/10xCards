@@ -3,7 +3,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn, signInWithMagicLink } from "@/lib/auth";
+import { supabaseClient } from "@/db/supabase.client";
+import { signIn, signInWithOtp, useAuth, verifyOtp } from "@/lib/auth";
 import type { LoginState } from "@/types";
 import { useState } from "react";
 
@@ -12,6 +13,8 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSuccess }: LoginFormProps) {
+  const { refreshProfile } = useAuth();
+  
   const [state, setState] = useState<LoginState>({
     status: "idle",
     error: null,
@@ -23,6 +26,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   const [magicLinkStatus, setMagicLinkStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
+  const [otpCode, setOtpCode] = useState("");
 
   const handleInputChange = (field: keyof LoginState["formData"]) => (
     e: React.ChangeEvent<HTMLInputElement>
@@ -86,17 +90,70 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     }
   };
 
-  const handleMagicLink = async (e: React.FormEvent) => {
+  const handleOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!magicLinkEmail) return;
 
     setMagicLinkStatus("loading");
     try {
-      await signInWithMagicLink(magicLinkEmail);
+      await signInWithOtp(magicLinkEmail);
       setMagicLinkStatus("success");
-      setMagicLinkEmail("");
+      // Don't clear magicLinkEmail - we need it for verification
     } catch (error) {
       setMagicLinkStatus("error");
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    console.log("handleVerifyOtp called with:", { otpCode, magicLinkEmail });
+    
+    if (!otpCode || !magicLinkEmail) {
+      console.log("Missing otpCode or magicLinkEmail");
+      return;
+    }
+
+    try {
+      console.log("Calling verifyOtp...");
+      const result = await verifyOtp(magicLinkEmail, otpCode);
+      console.log("OTP verification result:", result);
+      
+      // Successfully authenticated
+      console.log("OTP verification successful, redirecting...");
+      
+      // Check if session is set
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      console.log("Current session after OTP:", session);
+      
+      if (session?.user) {
+        console.log("User is authenticated:", session.user.email);
+        
+        // Refresh the auth context to update the UI
+        try {
+          await refreshProfile();
+          console.log("Profile refreshed successfully");
+        } catch (error) {
+          console.error("Error refreshing profile:", error);
+        }
+        
+        if (onSuccess) {
+          console.log("Calling onSuccess callback...");
+          onSuccess();
+        } else {
+          // Redirect to main page if no onSuccess callback
+          console.log("No onSuccess callback, redirecting to /generate...");
+          
+          // Redirect immediately
+          console.log("Redirecting now...");
+          window.location.href = "/generate";
+        }
+      } else {
+        console.error("No session found after OTP verification");
+        // Try to refresh the page to trigger auth state update
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      // You could add error handling here
     }
   };
 
@@ -160,11 +217,11 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           onClick={() => setShowMagicLink(!showMagicLink)}
           className="text-sm text-blue-600 hover:text-blue-500"
         >
-          {showMagicLink ? "Ukryj" : "Zaloguj się magic linkiem"}
+          {showMagicLink ? "Ukryj" : "Zaloguj się kodem OTP"}
         </button>
 
         {showMagicLink && (
-          <form onSubmit={handleMagicLink} className="mt-4 space-y-4">
+          <div className="mt-4 space-y-4">
             <div>
               <label
                 htmlFor="magic-email"
@@ -184,17 +241,47 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
             </div>
 
             <button
-              type="submit"
+              type="button"
+              onClick={handleOtp}
               disabled={magicLinkStatus === "loading"}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {magicLinkStatus === "loading" ? "Wysyłanie..." : "Wyślij magic link"}
+              {magicLinkStatus === "loading" ? "Wysyłanie..." : "Wyślij kod OTP"}
             </button>
 
             {magicLinkStatus === "success" && (
-              <p className="text-sm text-green-600 text-center">
-                Magic link został wysłany! Sprawdź swój email.
-              </p>
+              <div className="space-y-4">
+                <p className="text-sm text-green-600 text-center">
+                  Kod OTP został wysłany! Sprawdź swój email i wpisz kod poniżej.
+                </p>
+                
+                <div>
+                  <label
+                    htmlFor="otp-code"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Kod OTP
+                  </label>
+                  <input
+                    id="otp-code"
+                    type="text"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-center text-lg tracking-widest"
+                    placeholder="123456"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  Weryfikuj kod OTP
+                </button>
+              </div>
             )}
 
             {magicLinkStatus === "error" && (
@@ -202,7 +289,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                 Wystąpił błąd. Spróbuj ponownie.
               </p>
             )}
-          </form>
+          </div>
         )}
       </div>
 
