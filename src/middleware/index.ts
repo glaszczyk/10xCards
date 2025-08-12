@@ -3,15 +3,25 @@ import { supabaseClient } from "../db/supabase.client";
 
 const publicPaths = [
   "/",
-  "/login",
-  "/register",
-  "/about",
+  "/auth/login",
+  "/auth/register",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+  "/auth/callback",
   "/api",
-  "/auth",
-  "/generate",
-  "/learn",
-  "/manage",
+  "/about",
 ];
+
+// Dodaj funkcję sprawdzającą ścieżki auth
+const isAuthPath = (pathname: string) => {
+  return pathname.startsWith("/auth/");
+};
+
+const isPublicPath = (pathname: string) => {
+  return publicPaths.some(
+    (path) => pathname === path || pathname.startsWith(path + "/")
+  );
+};
 
 export const onRequest = defineMiddleware(
   async (
@@ -36,12 +46,16 @@ export const onRequest = defineMiddleware(
     }
 
     const url = new URL(request.url);
-    const isPublicPath = publicPaths.some(
-      (path) => url.pathname === path || url.pathname.startsWith(path + "/")
-    );
+    const pathname = url.pathname;
 
-    if (!isPublicPath && !session) {
-      return redirect("/login?redirectTo=" + encodeURIComponent(url.pathname));
+    // Jeśli użytkownik jest zalogowany i próbuje wejść na stronę auth
+    if (session && isAuthPath(pathname)) {
+      return redirect("/generate");
+    }
+
+    // Jeśli użytkownik nie jest zalogowany i próbuje wejść na chronioną trasę
+    if (!session && !isPublicPath(pathname)) {
+      return redirect(`/auth/login?redirectTo=${encodeURIComponent(pathname)}`);
     }
 
     return next();

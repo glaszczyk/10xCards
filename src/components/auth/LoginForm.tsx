@@ -3,6 +3,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { signIn, signInWithMagicLink } from "@/lib/auth";
 import type { LoginState } from "@/types";
 import { useState } from "react";
 
@@ -16,6 +17,12 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     error: null,
     formData: { email: "", password: "" },
   });
+
+  const [showMagicLink, setShowMagicLink] = useState(false);
+  const [magicLinkEmail, setMagicLinkEmail] = useState("");
+  const [magicLinkStatus, setMagicLinkStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
   const handleInputChange = (field: keyof LoginState["formData"]) => (
     e: React.ChangeEvent<HTMLInputElement>
@@ -63,18 +70,11 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setState(prev => ({ ...prev, status: "loading", error: null }));
 
     try {
-      // TODO: Na przyszłość - implementacja logiki logowania z Supabase
-      // const { data, error } = await signIn(state.formData.email, state.formData.password);
+      const data = await signIn(state.formData.email, state.formData.password);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate success
-      setState(prev => ({ ...prev, status: "success" }));
-      
-      // TODO: Na przyszłość - przekierowanie do /generate
-      if (onSuccess) {
-        onSuccess();
+      if (data.user) {
+        setState(prev => ({ ...prev, status: "success" }));
+        if (onSuccess) onSuccess();
       }
       
     } catch (error) {
@@ -83,8 +83,20 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         status: "error",
         error: error instanceof Error ? error.message : "Login failed. Please try again.",
       }));
-      
-      // TODO: Na przyszłość - dodać toast notification
+    }
+  };
+
+  const handleMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!magicLinkEmail) return;
+
+    setMagicLinkStatus("loading");
+    try {
+      await signInWithMagicLink(magicLinkEmail);
+      setMagicLinkStatus("success");
+      setMagicLinkEmail("");
+    } catch (error) {
+      setMagicLinkStatus("error");
     }
   };
 
@@ -140,6 +152,59 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           "Sign In"
         )}
       </Button>
+
+      {/* Magic Link Section */}
+      <div className="mt-6">
+        <button
+          type="button"
+          onClick={() => setShowMagicLink(!showMagicLink)}
+          className="text-sm text-blue-600 hover:text-blue-500"
+        >
+          {showMagicLink ? "Ukryj" : "Zaloguj się magic linkiem"}
+        </button>
+
+        {showMagicLink && (
+          <form onSubmit={handleMagicLink} className="mt-4 space-y-4">
+            <div>
+              <label
+                htmlFor="magic-email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <input
+                id="magic-email"
+                type="email"
+                value={magicLinkEmail}
+                onChange={(e) => setMagicLinkEmail(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="twój@email.com"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={magicLinkStatus === "loading"}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            >
+              {magicLinkStatus === "loading" ? "Wysyłanie..." : "Wyślij magic link"}
+            </button>
+
+            {magicLinkStatus === "success" && (
+              <p className="text-sm text-green-600 text-center">
+                Magic link został wysłany! Sprawdź swój email.
+              </p>
+            )}
+
+            {magicLinkStatus === "error" && (
+              <p className="text-sm text-red-600 text-center">
+                Wystąpił błąd. Spróbuj ponownie.
+              </p>
+            )}
+          </form>
+        )}
+      </div>
 
       {/* Links */}
       <div className="text-center space-y-2">

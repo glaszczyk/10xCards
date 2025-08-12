@@ -1,5 +1,51 @@
 # Plan Implementacji Autoryzacji Supabase Auth - 10xCards
 
+## 🎯 Status Implementacji
+
+### ✅ WYKONANE (Data: 2025-01-22)
+
+#### Konfiguracja Projektu
+
+- ✅ **Konfiguracja Astro**: Zmieniono `output: "static"` na `output: "server"` dla obsługi autoryzacji
+- ✅ **Plik .env**: Utworzono z konfiguracją lokalnego Supabase
+- ✅ **Konfiguracja Supabase Client**: Utworzono `src/config/supabase.ts` z fallback na lokalne wartości
+- ✅ **Naprawiono błąd "supabaseUrl is required"**: Usunięto `process.env` i zostawiono tylko `import.meta.env`
+- ✅ **Debugowanie**: Dodano i usunięto logi debugowania po rozwiązaniu problemu
+
+#### Struktura Plików
+
+- ✅ **`src/config/supabase.ts`**: Centralna konfiguracja Supabase z fallback
+- ✅ **`src/db/supabase.client.ts`**: Zaktualizowany klient używający nowej konfiguracji
+
+### 🔄 CO WYMAGA IMPLEMENTACJI:
+
+#### Konfiguracja Supabase
+
+- Konfiguracja projektu w dashboardzie Supabase
+- Ustawienie URL-i i kluczy API
+- Konfiguracja email templates
+
+#### Baza Danych
+
+- Tabela `profiles` z RLS
+- Aktualizacja istniejących tabel (source_texts, flashcards)
+- Migracje i polityki bezpieczeństwa
+
+#### Funkcjonalności Auth
+
+- Magic Link authentication
+- Reset hasła
+- Weryfikacja email
+- Integracja UI z backend
+
+#### Middleware i Bezpieczeństwo
+
+- Rozszerzenie middleware o autoryzację
+- Ochrona tras API
+- Obsługa sesji
+
+---
+
 ## 📋 Analiza Istniejącego Stanu
 
 ### ✅ Co jest już zaimplementowane:
@@ -19,6 +65,34 @@
 - Weryfikacja email
 - Integracja UI z backend
 - Rozszerzenie middleware
+
+---
+
+## 📚 LEKCJE Z ROZWIĄZANIA PROBLEMU "supabaseUrl is required"
+
+### Problem
+
+Błąd `supabaseUrl is required` występował podczas hydratacji React w przeglądarce.
+
+### Przyczyna
+
+- **`process.env` nie jest dostępne w przeglądarce** - to jest zmienna Node.js
+- **`import.meta.env` jest dostępne w przeglądarce** - to jest sposób Vite/Astro
+- **Astro z `output: "static"`** nie obsługuje autoryzacji - potrzebny `output: "server"`
+
+### Rozwiązanie
+
+1. Zmieniono `astro.config.mjs`: `output: "static"` → `output: "server"`
+2. Utworzono `src/config/supabase.ts` z fallback na lokalne wartości
+3. Usunięto `process.env` z konfiguracji klienta
+4. Zaktualizowano `supabase.client.ts` aby używał nowej konfiguracji
+
+### Kluczowe Wnioski
+
+- **W przeglądarce używaj `import.meta.env`**
+- **Po stronie serwera używaj `process.env`**
+- **Astro z autoryzacją wymaga `output: "server"`**
+- **Fallback wartości są ważne dla lokalnego rozwoju**
 
 ---
 

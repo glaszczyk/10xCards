@@ -1,13 +1,15 @@
 import { supabaseClient } from "@/db/supabase.client";
-import type { AuthSession } from "@/types";
+import type { AuthSession, Profile } from "@/types";
 import type { User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 
 // Auth Context
 export const AuthContext = createContext<AuthSession>({
   user: null,
+  profile: null,
   isLoading: true,
   isAuthenticated: false,
+  refreshProfile: async () => {},
 });
 
 // Auth Provider Hook
@@ -22,20 +24,42 @@ export function useAuth() {
 // Auth Provider Component
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Funkcja do odświeżania profilu
+  const refreshProfile = async () => {
+    if (user) {
+      try {
+        const profileData = await getUserProfile(user.id);
+        setProfile(profileData);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        setProfile(null);
+      }
+    }
+  };
 
   useEffect(() => {
     // Get initial session
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    supabaseClient.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        await refreshProfile();
+      }
       setIsLoading(false);
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+    } = supabaseClient.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        await refreshProfile();
+      } else {
+        setProfile(null);
+      }
       setIsLoading(false);
     });
 
@@ -48,8 +72,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email: user.email || '',
       created_at: user.created_at
     } : null,
+    profile,
     isLoading,
     isAuthenticated: !!user,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -98,6 +124,70 @@ export function requireAuth(user: User | null): User {
     throw new Error("Authentication required");
   }
   return user;
+}
+
+// Magic Link authentication
+export async function signInWithMagicLink(email: string) {
+  const { data, error } = await supabaseClient.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
+    },
+  });
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+// Reset password
+export async function resetPassword(email: string) {
+  const { data, error } = await supabaseClient.auth.resetPasswordForEmail(
+    email,
+    {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    }
+  );
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+// Update password
+export async function updatePassword(newPassword: string) {
+  const { data, error } = await supabaseClient.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+// Get user profile
+export async function getUserProfile(userId: string) {
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+// Update user profile
+export async function updateUserProfile(
+  userId: string,
+  updates: Partial<Profile>
+) {
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .update(updates)
+    .eq("id", userId)
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
 }
 
 export function redirectIfAuthenticated(user: User | null, targetPath = "/generate") {
