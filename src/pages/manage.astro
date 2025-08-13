@@ -4,21 +4,8 @@ import { MainLayout } from "@/components/shared/MainLayout";
 import AppLayout from "@/layouts/AppLayout.astro";
 ---
 
-<AppLayout title="Zarządzanie fiszkami - 10xCards">
-  <MainLayout client:load currentPath="/manage" showAuthRequired={true}>
-    <div class="space-y-6">
-      <div class="text-center">
-        <h1 class="text-3xl font-bold tracking-tight mb-2">
-          Zarządzanie fiszkami
-        </h1>
-        <p class="text-muted-foreground text-lg">
-          Organizuj i edytuj swoje fiszki
-        </p>
-      </div>
-
-      <div class="max-w-6xl mx-auto">
-        <ManagePage client:load />
-      </div>
-    </div>
+<AppLayout title="Zarządzaj - 10xCards">
+  <MainLayout client:load currentPath="/manage">
+    <ManagePage client:load />
   </MainLayout>
 </AppLayout>

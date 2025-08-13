@@ -10,9 +10,10 @@ import { useState } from "react";
 
 interface LoginFormProps {
   onSuccess?: () => void;
+  redirectTo?: string;
 }
 
-export function LoginForm({ onSuccess }: LoginFormProps) {
+export function LoginForm({ onSuccess, redirectTo = "/generate" }: LoginFormProps) {
   const { refreshProfile } = useAuth();
   
   const [state, setState] = useState<LoginState>({
@@ -27,6 +28,41 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     "idle" | "loading" | "success" | "error"
   >("idle");
   const [otpCode, setOtpCode] = useState("");
+
+  // Funkcja do przekierowania po zalogowaniu
+  const handleSuccessfulLogin = async () => {
+    try {
+      // Sprawdź czy sesja jest ustawiona
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      
+      if (!session?.user) {
+        // Poczekaj chwilę na aktualizację stanu
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Sprawdź ponownie
+        const { data: { session: session2 } } = await supabaseClient.auth.getSession();
+        
+        if (!session2?.user) {
+          return;
+        }
+      }
+      
+      // Odśwież profil użytkownika
+      await refreshProfile();
+      
+      // Wywołaj callback onSuccess jeśli istnieje
+      if (onSuccess) {
+        onSuccess();
+      }
+      
+      // Przekieruj na docelową stronę
+      window.location.href = redirectTo;
+      
+    } catch (error) {
+      // W przypadku błędu, przekieruj na domyślną stronę
+      window.location.href = "/generate";
+    }
+  };
 
   const handleInputChange = (field: keyof LoginState["formData"]) => (
     e: React.ChangeEvent<HTMLInputElement>
@@ -52,11 +88,6 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     }
     
     if (!password) {
-      setState(prev => ({ ...prev, error: "Password is required" }));
-      return false;
-    }
-    
-    if (password.length < 6) {
       setState(prev => ({ ...prev, error: "Password must be at least 6 characters" }));
       return false;
     }
@@ -78,7 +109,8 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       
       if (data.user) {
         setState(prev => ({ ...prev, status: "success" }));
-        if (onSuccess) onSuccess();
+        await handleSuccessfulLogin();
+      } else {
       }
       
     } catch (error) {
@@ -105,55 +137,26 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   };
 
   const handleVerifyOtp = async () => {
-    console.log("handleVerifyOtp called with:", { otpCode, magicLinkEmail });
     
     if (!otpCode || !magicLinkEmail) {
-      console.log("Missing otpCode or magicLinkEmail");
       return;
     }
 
     try {
-      console.log("Calling verifyOtp...");
       const result = await verifyOtp(magicLinkEmail, otpCode);
-      console.log("OTP verification result:", result);
       
       // Successfully authenticated
-      console.log("OTP verification successful, redirecting...");
       
       // Check if session is set
       const { data: { session } } = await supabaseClient.auth.getSession();
-      console.log("Current session after OTP:", session);
       
       if (session?.user) {
-        console.log("User is authenticated:", session.user.email);
-        
-        // Refresh the auth context to update the UI
-        try {
-          await refreshProfile();
-          console.log("Profile refreshed successfully");
-        } catch (error) {
-          console.error("Error refreshing profile:", error);
-        }
-        
-        if (onSuccess) {
-          console.log("Calling onSuccess callback...");
-          onSuccess();
-        } else {
-          // Redirect to main page if no onSuccess callback
-          console.log("No onSuccess callback, redirecting to /generate...");
-          
-          // Redirect immediately
-          console.log("Redirecting now...");
-          window.location.href = "/generate";
-        }
+        await handleSuccessfulLogin();
       } else {
-        console.error("No session found after OTP verification");
         // Try to refresh the page to trigger auth state update
         window.location.reload();
       }
     } catch (error) {
-      console.error("OTP verification error:", error);
-      // You could add error handling here
     }
   };
 
@@ -224,7 +227,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           <div className="mt-4 space-y-4">
             <div>
               <label
-                htmlFor="magic-email"
+                id="magic-email"
                 className="block text-sm font-medium text-gray-700"
               >
                 Email
@@ -257,7 +260,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                 
                 <div>
                   <label
-                    htmlFor="otp-code"
+                    id="otp-code"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Kod OTP

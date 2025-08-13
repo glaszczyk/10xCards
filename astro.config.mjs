@@ -16,4 +16,6 @@ export default defineConfig({
     },
   },
   integrations: [react()],
+  // Dodaj middleware
+  middleware: "./src/middleware/index.ts",
 });

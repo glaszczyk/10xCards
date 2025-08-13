@@ -41,29 +41,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    let mounted = true;
+
     // Get initial session
-    supabaseClient.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await refreshProfile();
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        
+        if (mounted) {
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            await refreshProfile();
+          }
+          setIsLoading(false);
+        }
+      } catch (error) {
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
-      setIsLoading(false);
-    });
+    };
+
+    getInitialSession();
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabaseClient.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await refreshProfile();
-      } else {
-        setProfile(null);
+    } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      if (mounted) {
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          await refreshProfile();
+        } else {
+          setProfile(null);
+        }
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const value: AuthSession = {
@@ -92,6 +111,13 @@ export async function signIn(email: string, password: string) {
     throw new Error(error.message);
   }
   
+  // Poczekaj chwilę na aktualizację stanu auth
+  // Supabase auth state change może być asynchroniczny
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Sprawdź czy sesja jest ustawiona
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  
   return data;
 }
 
@@ -109,10 +135,26 @@ export async function signUp(email: string, password: string) {
 }
 
 export async function signOut() {
-  const { error } = await supabaseClient.auth.signOut();
-  
-  if (error) {
-    throw new Error(error.message);
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+    
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    // Poczekaj chwilę na usunięcie cookies
+    // Supabase usuwa cookies asynchronicznie
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Sprawdź czy cookies zostały usunięte
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    
+    // Po wylogowaniu przekieruj na stronę główną
+    window.location.href = "/";
+    
+  } catch (error) {
+    // W przypadku błędu, przekieruj i tak
+    window.location.href = "/";
   }
 }
 

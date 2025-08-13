@@ -10,7 +10,6 @@ const publicPaths = [
   "/auth/callback",
   "/api",
   "/about",
-  "/generate", // Add generate to public paths
 ];
 
 // Dodaj funkcję sprawdzającą ścieżki auth
@@ -33,65 +32,78 @@ export const onRequest = defineMiddleware(
     }: { locals: App.Locals; request: Request; redirect: Function },
     next
   ) => {
+    const url = new URL(request.url);
+    const pathname = url.pathname;
+
+    // Ustaw Supabase client w locals
     (locals as any).supabase = supabaseClient;
-    (locals as any).user = null;
-    (locals as any).session = null;
 
-    // Get cookies from request
+    // Sprawdź cookies dla autoryzacji
     const cookies = request.headers.get("cookie");
-    console.log("Middleware - Cookies:", cookies);
-
-    // Parse cookies to see what we have
-    if (cookies) {
-      const cookieArray = cookies.split(";").map((c) => c.trim());
-      console.log("Middleware - Parsed cookies:", cookieArray);
-
-      // Check for Supabase specific cookies
-      const supabaseCookies = cookieArray.filter(
-        (c) => c.startsWith("sb-") || c.startsWith("supabase-auth-token")
-      );
-      console.log("Middleware - Supabase cookies:", supabaseCookies);
-    }
-
-    // Check for Supabase auth cookies instead of getSession()
     const hasAuthCookie =
       cookies &&
       (cookies.includes("sb-") || cookies.includes("supabase-auth-token"));
 
-    console.log("Middleware - hasAuthCookie result:", hasAuthCookie);
+    // Jeśli użytkownik ma cookie auth, spróbuj pobrać sesję
+    let authInfo: {
+      hasAuthCookie: boolean;
+      isAuthenticated: boolean;
+      user: any;
+      session: any;
+    } = {
+      hasAuthCookie: !!hasAuthCookie,
+      isAuthenticated: false,
+      user: null,
+      session: null,
+    };
 
-    // Try to get session, but don't rely on it for middleware
-    const {
-      data: { session },
-    } = await supabaseClient.auth.getSession();
+    if (hasAuthCookie) {
+      try {
+        // Pobierz sesję przez Supabase
+        const {
+          data: { session },
+          error,
+        } = await supabaseClient.auth.getSession();
 
-    // Debug: log session info
-    console.log("Middleware - Session check:", {
-      hasSession: !!session,
-      hasAuthCookie: hasAuthCookie,
-      userId: session?.user?.id,
-      userEmail: session?.user?.email,
-      pathname: new URL(request.url).pathname,
-      cookies: cookies,
-    });
-
-    if (session) {
-      (locals as any).user = session.user;
-      (locals as any).session = session;
+        if (session && !error) {
+          authInfo = {
+            hasAuthCookie: true,
+            isAuthenticated: true,
+            user: session.user,
+            session: session,
+          };
+        } else {
+          authInfo = {
+            hasAuthCookie: true,
+            isAuthenticated: false,
+            user: null,
+            session: null,
+          };
+        }
+      } catch (error) {
+        authInfo = {
+          hasAuthCookie: true,
+          isAuthenticated: false,
+          user: null,
+          session: null,
+        };
+      }
     }
 
-    const url = new URL(request.url);
-    const pathname = url.pathname;
+    // Ustaw dane w locals - dostępne dla stron Astro i React
+    (locals as any).auth = authInfo;
+    (locals as any).hasAuthCookie = hasAuthCookie;
+    (locals as any).isPublicPath = isPublicPath(pathname);
+    (locals as any).isAuthenticated = authInfo.isAuthenticated;
+    (locals as any).user = authInfo.user;
+    (locals as any).session = authInfo.session;
 
-    // Tymczasowo wyłączamy middleware dla chronionych tras
-    // Pozwalamy na dostęp do wszystkich tras, a autoryzację obsługuje MainLayout
-    console.log("Middleware - Allowing access to:", pathname);
-
-    // Jeśli użytkownik ma cookie auth i próbuje wejść na stronę auth
-    if (hasAuthCookie && isAuthPath(pathname)) {
+    // Jeśli użytkownik jest zalogowany i próbuje wejść na stronę auth
+    if (authInfo.isAuthenticated && isAuthPath(pathname)) {
       return redirect("/generate");
     }
 
+    // Pozwól na dostęp do wszystkich tras - React będzie obsługiwał autoryzację
     return next();
   }
 );

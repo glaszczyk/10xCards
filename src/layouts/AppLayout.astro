@@ -2,13 +2,11 @@
 export interface Props {
   title?: string;
   description?: string;
-  showAuthRequired?: boolean;
 }
 
 const {
   title = "10xCards - AI-Powered Flashcard Learning",
   description = "Create and learn with AI-generated flashcards. Boost your learning with spaced repetition and intelligent content generation.",
-  showAuthRequired = false,
 } = Astro.props;
 ---
 
