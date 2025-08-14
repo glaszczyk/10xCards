@@ -66,6 +66,26 @@
 - Ochrona tras API
 - ~~Obsługa sesji~~ ✅ **Podstawowa obsługa gotowa**
 
+#### 🚨 NOWE TODO - PRIORYTET WYSOKI
+
+- **Forgot Password wymaga implementacji**:
+
+  - Strona `/auth/forgot-password` jest zakomentowana
+  - Komponent `ForgotPasswordForm` wymaga naprawy błędów
+  - Funkcjonalność wysyłania linku resetowania nie działa
+
+- **Reset Password wymaga implementacji**:
+
+  - Strona `/auth/reset-password` może mieć błędy
+  - Komponent `ResetPasswordForm` wymaga weryfikacji
+  - Funkcjonalność zmiany hasła nie została przetestowana
+
+- **Przekierowania po zalogowaniu - PROBLEM KRYTYCZNY**:
+  - Non-public links po zalogowaniu NIE przekierowują użytkownika do docelowej strony
+  - Użytkownik zostaje na stronie logowania mimo udanego logowania
+  - Middleware nie obsługuje poprawnie parametru `redirectTo`
+  - **Status**: Częściowo zaimplementowane ale nie działa poprawnie
+
 ---
 
 ## 📋 Analiza Istniejącego Stanu
