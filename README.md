@@ -152,6 +152,12 @@ For detailed documentation, see [docs/data-providers.md](docs/data-providers.md)
 
 7.  Open your browser to `http://localhost:4321` (or the port specified by Astro).
 
+**Testing Setup:**
+
+- The project includes a comprehensive testing environment
+- See [Section 6: Automated Testing](#6-automated-testing) for details
+- Run `npm test` to verify the testing setup
+
 ## 5. Available Scripts
 
 Based on a typical Astro/React project using npm:
@@ -170,9 +176,139 @@ Based on a typical Astro/React project using npm:
 - `npx supabase db push`: Apply database migrations
 - `npx supabase db reset`: Reset local database
 
+**Testing Scripts:**
+
+- `npm test`: Run critical and component tests
+- `npm run test:critical`: Run critical business function tests
+- `npm run test:components`: Run React component tests
+- `npm run test:integration`: Run integration tests
+- `npm run test:e2e`: Run end-to-end tests
+- `npm run test:coverage`: Generate coverage report
+- `npm run test:watch`: Watch mode for development
+- `npm run test:ci`: Run all MVP tests (critical + components + integration)
+- `npm run test:ui`: Run tests with Vitest UI
+
 _(Note: These are common scripts. Verify exact scripts in `package.json`)_
 
-## 6. API Endpoints
+## 6. Automated Testing
+
+The project includes a comprehensive automated testing strategy designed for MVP development with iterative growth:
+
+### Testing Stack
+
+- **Vitest**: Fast unit and integration testing with native Vite support
+- **@testing-library/react**: React component testing with user-centric approach
+- **Playwright**: End-to-end testing across multiple browsers
+- **MSW**: API mocking for isolated testing
+
+### Test Coverage Goals
+
+**MVP Phase (Current):**
+
+- **Critical Functions**: 90% coverage (AI, SRS, Auth, CRUD)
+- **Overall Code**: 60% unit test coverage
+- **Integration Tests**: 40% coverage
+- **E2E Tests**: 3-5 critical user journeys
+
+**Post-MVP Goals:**
+
+- **Unit Tests**: 80-90% coverage
+- **Integration Tests**: 70-85% coverage
+- **E2E Tests**: 10+ user journeys
+- **Performance & Security**: Full coverage
+
+### Test Structure
+
+```
+src/
+├── __tests__/
+│   ├── critical/           # High-risk business functions
+│   │   ├── ai-generation.test.ts
+│   │   ├── srs-algorithm.test.ts
+│   │   ├── auth-flow.test.ts
+│   │   └── core-crud.test.ts
+│   ├── components/         # React component tests
+│   ├── lib/               # Utility function tests
+│   ├── mocks/             # MSW configuration
+│   └── factories/         # Test data factories
+```
+
+tests/
+├── integration/ # Cross-module workflows
+├── e2e/ # End-to-end user journeys
+└── fixtures/ # Test data and mocks
+
+````
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run critical tests only
+npm run test:critical
+
+# Run component tests
+npm run test:components
+
+# Run integration tests
+npm run test:integration
+
+# Run E2E tests
+npm run test:e2e
+
+# Run tests with coverage
+npm run test:coverage
+
+# Watch mode for development
+npm run test:watch
+
+# CI mode (critical + components + integration)
+npm run test:ci
+
+# Test with UI
+npm run test:ui
+````
+
+### Testing Strategy
+
+The testing approach follows the **20/80 rule**: 20% of tests cover 80% of business risk. Tests are prioritized by:
+
+1. **High Risk**: AI integration, SRS algorithm, Authentication (thorough testing)
+2. **Medium Risk**: UI components, Data operations (basic testing)
+3. **Low Risk**: Utilities, Styling (minimal testing)
+
+### Test Environment Status
+
+**✅ Ready Components:**
+
+- **Critical Tests**: 4/4 test files ready (AI, SRS, Auth, CRUD)
+- **Integration Tests**: 3/3 test files ready (User Journey, Data Provider, API)
+- **E2E Tests**: 3/3 test files ready (User Flow, AI Generation, Learning)
+- **Component Tests**: 0/0 files ready (to be implemented)
+- **Library Tests**: 0/0 files ready (to be implemented)
+- **Test Infrastructure**: MSW, Playwright, Vitest configurations
+- **CI/CD Pipeline**: GitHub Actions workflow
+
+**🔄 Next Steps:**
+
+- Implement actual test logic in placeholder files
+- Add component tests for React components (currently 0/0 files)
+- Add library tests for utility functions (currently 0/0 files)
+- Expand test coverage to meet MVP goals
+
+### Test Configuration Files
+
+- `vitest.config.ts` - Main Vitest configuration
+- `vitest.critical.config.ts` - Critical tests configuration
+- `vitest.components.config.ts` - Component tests configuration
+- `vitest.integration.config.ts` - Integration tests configuration
+- `playwright.config.ts` - E2E tests configuration
+
+For detailed testing documentation, see [TESTING.md](TESTING.md) and [.ai/test-plan.md](.ai/test-plan.md).
+
+## 7. API Endpoints
 
 ### Flashcards
 
@@ -198,7 +334,7 @@ _(Note: These are common scripts. Verify exact scripts in `package.json`)_
 
 - `GET /api/v1/event-logs` - List event logs with filtering and pagination
 
-## 7. Event Logging
+## 8. Event Logging
 
 The application includes comprehensive event logging for all CRUD operations:
 
@@ -232,7 +368,7 @@ The application includes comprehensive event logging for all CRUD operations:
 
 For detailed documentation, see [docs/event-logging-implementation.md](docs/event-logging-implementation.md).
 
-## 8. Configuration Management
+## 9. Configuration Management
 
 The project includes a configuration switcher that allows easy switching between different environments:
 
@@ -273,7 +409,7 @@ The project includes a configuration switcher that allows easy switching between
 
 For detailed documentation, see [docs/configuration-switcher.md](docs/configuration-switcher.md).
 
-## 9. Project Scope (MVP)
+## 10. Project Scope (MVP)
 
 The Minimum Viable Product (MVP) focuses on core functionalities:
 
@@ -285,11 +421,11 @@ The Minimum Viable Product (MVP) focuses on core functionalities:
 
 **Out of Scope for MVP:** Import/Export, Non-text input, Sharing, Decks/Tagging, Advanced AI config, LMS integration, Mobile app, Offline mode, Detailed stats, Anonymous logging, Rich text editing.
 
-## 10. Project Status
+## 11. Project Status
 
 - **Current Phase:** Development (MVP)
 - **Next Steps:** Implementation of core modules (Generation, Learning, Management), UI development, Backend integration.
 
-## 11. License
+## 12. License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details. (Note: A `LICENSE` file needs to be created, typically with the standard MIT license text).
