@@ -1,16 +1,11 @@
 ---
-import { GenerateLayout } from "@/components/generate/GenerateLayout";
 import { GeneratePage } from "@/components/generate/GeneratePage";
+import { MainLayout } from "@/components/shared/MainLayout";
 import AppLayout from "@/layouts/AppLayout.astro";
 ---
 
-<AppLayout title="Generate Flashcards - 10xCards">
-  <GenerateLayout
-    client:load
-    title="Generate Flashcards"
-    subtitle="Create flashcards from any text using AI"
-  >
+<AppLayout title="Generuj - 10xCards">
+  <MainLayout client:load currentPath="/generate">
     <GeneratePage client:load />
-  </GenerateLayout>
+  </MainLayout>
 </AppLayout>
-

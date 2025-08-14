@@ -3,6 +3,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { signUp } from "@/lib/auth";
 import type { RegisterState } from "@/types";
 import { useState } from "react";
 
@@ -74,18 +75,11 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     setState(prev => ({ ...prev, status: "loading", error: null }));
 
     try {
-      // TODO: Na przyszłość - implementacja logiki rejestracji z Supabase
-      // const { data, error } = await signUp(state.formData.email, state.formData.password);
+      const data = await signUp(state.formData.email, state.formData.password);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate success
-      setState(prev => ({ ...prev, status: "success" }));
-      
-      // TODO: Na przyszłość - przekierowanie do /generate
-      if (onSuccess) {
-        onSuccess();
+      if (data.user) {
+        setState(prev => ({ ...prev, status: "success" }));
+        if (onSuccess) onSuccess();
       }
       
     } catch (error) {
@@ -107,6 +101,15 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       {state.error && (
         <Alert variant="destructive">
           <AlertDescription>{state.error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Success Alert */}
+      {state.status === "success" && (
+        <Alert>
+          <AlertDescription>
+            Konto zostało utworzone! Sprawdź swój email, aby potwierdzić rejestrację.
+          </AlertDescription>
         </Alert>
       )}
 

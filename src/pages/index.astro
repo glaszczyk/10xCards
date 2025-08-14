@@ -1,12 +1,10 @@
 ---
-import { Header } from "@/components/shared/Header";
+import { MainLayout } from "@/components/shared/MainLayout";
 import AppLayout from "@/layouts/AppLayout.astro";
 ---
 
 <AppLayout title="10xCards - AI-Powered Flashcard Learning">
-  <div class="min-h-screen bg-background">
-    <Header client:load currentPage="home" />
-
+  <MainLayout client:load currentPath="/">
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-6">
       <div class="space-y-6">
@@ -40,14 +38,5 @@ import AppLayout from "@/layouts/AppLayout.astro";
         </div>
       </div>
     </main>
-
-    <!-- Footer -->
-    <footer class="border-t bg-card/50 mt-auto">
-      <div class="container mx-auto px-4 py-4">
-        <div class="text-center text-sm text-muted-foreground">
-          <p>&copy; 2024 10xCards. AI-powered flashcard learning platform.</p>
-        </div>
-      </div>
-    </footer>
-  </div>
+  </MainLayout>
 </AppLayout>

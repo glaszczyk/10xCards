@@ -3,6 +3,10 @@ import { AuthCard } from "@/components/auth/AuthCard";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { LoginForm } from "@/components/auth/LoginForm";
 import AppLayout from "@/layouts/AppLayout.astro";
+
+// Pobierz parametr redirectTo z URL
+const { searchParams } = Astro.url;
+const redirectTo = searchParams.get("redirectTo") || "/generate";
 ---
 
 <AppLayout title="Sign In - 10xCards">
@@ -18,9 +22,9 @@ import AppLayout from "@/layouts/AppLayout.astro";
     >
       <LoginForm
         client:load
+        redirectTo={redirectTo}
         onSuccess={() => {
-          // TODO: Na przyszłość - przekierowanie do /generate
-          console.log("Login successful - redirect to /generate");
+          // Przekierowanie nastąpi automatycznie
         }}
       />
     </AuthCard>

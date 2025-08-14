@@ -1,14 +1,11 @@
 ---
 import { ManagePage } from "@/components/manage/ManagePage";
-import { Header } from "@/components/shared/Header";
+import { MainLayout } from "@/components/shared/MainLayout";
 import AppLayout from "@/layouts/AppLayout.astro";
 ---
 
-<AppLayout title="Zarządzanie fiszkami - 10xCards">
-  <div class="min-h-screen bg-background">
-    <Header client:load currentPage="manage" />
-    <div class="container mx-auto px-4 py-8">
-      <ManagePage client:load />
-    </div>
-  </div>
+<AppLayout title="Zarządzaj - 10xCards">
+  <MainLayout client:load currentPath="/manage">
+    <ManagePage client:load />
+  </MainLayout>
 </AppLayout>
