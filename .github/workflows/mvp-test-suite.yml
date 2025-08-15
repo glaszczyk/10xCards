@@ -30,8 +30,11 @@ jobs:
       - name: Run integration tests
         run: npm run test:integration
 
-      - name: Run E2E tests
-        run: npm run test:e2e
+      # TODO: E2E tests are currently placeholders - enable when ready
+      # - name: Install Playwright browsers
+      #   run: npx playwright install --with-deps
+      # - name: Run E2E tests
+      #   run: npm run test:e2e
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3

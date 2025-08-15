@@ -79,6 +79,9 @@ For detailed documentation, see [docs/data-providers.md](docs/data-providers.md)
 - ⚠️ **SRS Fields**: Some SRS algorithm fields (`repetitions`, `state`) are currently stored in application memory
 - 🔄 **Database Migration Planned**: See [docs/future-migrations.md](docs/future-migrations.md) for detailed migration plan
 - 🚀 **Performance**: Additional optimizations planned for large-scale deployments
+- 🧪 **E2E Tests**: Currently placeholder tests - see [docs/e2e-testing-status.md](docs/e2e-testing-status.md) for implementation plan
+- 🔧 **CI/CD**: See [.github/workflows/README.md](.github/workflows/README.md) for workflow details
+- 📚 **E2E Setup**: See [docs/enable-e2e-tests.md](docs/enable-e2e-tests.md) for future activation guide
 
 ### TODO: Upcoming Migrations
 
