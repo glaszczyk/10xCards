@@ -66,7 +66,27 @@ DATA_PROVIDER=supabase|mock|auto
 
 For detailed documentation, see [docs/data-providers.md](docs/data-providers.md).
 
-## 4. Getting Started Locally
+## 4. Development Status & Future Plans
+
+### Current Status
+
+- ✅ **MVP Core Features**: AI flashcard generation, basic SRS algorithm, user authentication
+- ✅ **Testing Infrastructure**: Comprehensive test suite with 90%+ coverage of critical functions
+- ✅ **Data Architecture**: Flexible provider system (Supabase + Mock)
+
+### Known Limitations & Future Work
+
+- ⚠️ **SRS Fields**: Some SRS algorithm fields (`repetitions`, `state`) are currently stored in application memory
+- 🔄 **Database Migration Planned**: See [docs/future-migrations.md](docs/future-migrations.md) for detailed migration plan
+- 🚀 **Performance**: Additional optimizations planned for large-scale deployments
+
+### TODO: Upcoming Migrations
+
+- **Q1 2025**: Add SRS fields to database schema
+- **Q1 2025**: Update application code to use database fields
+- **Q1 2025**: Performance optimization and scaling improvements
+
+## 5. Getting Started Locally
 
 1.  **Clone the repository:**
 

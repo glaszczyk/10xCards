@@ -20,8 +20,11 @@ export class MVPTestData {
       ease_factor: 2.5,
       interval: 1,
       next_review_at: new Date().toISOString(),
-      repetitions: 0,
-      state: 0,
+      // TODO: FUTURE MIGRATION - These fields will be moved to database
+      // Current: temporary values for SRS algorithm compatibility
+      // Future: values will come from database after migration
+      // repetitions: 0, // opcjonalne pole dla SRS
+      // state: 0 // opcjonalne pole dla SRS
       ...overrides,
     };
   }

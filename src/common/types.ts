@@ -45,6 +45,12 @@ export type EventLogRow = Tables["event_logs"]["Row"];
 export interface Flashcard extends FlashcardRow {
   question: string; // alias dla front
   answer: string; // alias dla back
-  repetitions: number; // alias dla reps (będzie dodane do bazy)
-  state: number; // alias dla state (będzie dodane do bazy)
+
+  // TODO: FUTURE MIGRATION - Add SRS fields to database
+  // These fields are currently optional but will be required in future migrations:
+  // - repetitions: number (number of times card has been reviewed)
+  // - state: number (SRS state: 0=new, 1=learning, 2=review, 3=relearning)
+  // Migration needed: ALTER TABLE flashcards ADD COLUMN repetitions INTEGER DEFAULT 0, ADD COLUMN state INTEGER DEFAULT 0;
+  repetitions?: number; // opcjonalne pole dla SRS
+  state?: number; // opcjonalne pole dla SRS
 }
