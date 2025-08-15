@@ -1,0 +1,59 @@
+name: MVP Test Suite
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10 # Realistic timeout dla MVP
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run critical tests
+        run: npm run test:critical
+        env:
+          DATA_PROVIDER: mock
+
+      - name: Run basic component tests
+        run: npm run test:components
+
+      - name: Run integration tests
+        run: npm run test:integration
+
+      # TODO: E2E tests are currently placeholders - enable when ready
+      # - name: Install Playwright browsers
+      #   run: npx playwright install --with-deps
+      # - name: Run E2E tests
+      #   run: npm run test:e2e
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          fail_ci_if_error: false # MVP - nie blokuj CI dla coverage
+
+
+  # Post-MVP: Add performance and security testing
+  # performance:
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   steps:
+  #     - name: Lighthouse CI
+  #       run: npm run test:performance
+
+  # security:
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   steps:
+  #     - name: OWASP ZAP
+  #       run: npm run test:security

@@ -53,15 +53,23 @@ export function FlashcardPreview({ flashcards, sourceText, onSave, onBack, isSav
   const handleAddCard = () => {
     const newCard: Flashcard = {
       id: `temp-${Date.now()}`,
+      front: "",
+      back: "",
       question: "",
       answer: "",
       source: "ai-edited",
+      user_id: "temp-user-id", // TODO: Replace with actual user ID from auth context
+      source_text_id: null,
       ease_factor: 2.5,
-      repetitions: 0,
       interval: 0,
       next_review_at: new Date().toISOString(),
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      // TODO: FUTURE MIGRATION - These fields will be moved to database
+      // Current: temporary values for SRS algorithm compatibility
+      // Future: values will come from database after migration
+      repetitions: 0, // opcjonalne pole dla SRS
+      state: 0 // opcjonalne pole dla SRS
     };
     setEditableCards(prev => [...prev, newCard]);
     setCurrentIndex(editableCards.length); // Go to new card
