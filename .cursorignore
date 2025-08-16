@@ -1,4 +1,23 @@
-# environment variables
+# Environment files
 .env
-.env.production
 .env.test
+.env.production
+
+# Vercel deployment files
+.vercel/
+
+# Build outputs
+dist/
+.astro/
+
+# Test results
+test-results/
+playwright-report/
+coverage/
+
+# Dependencies
+node_modules/
+
+# Generated files
+*.log
+*.lcov

@@ -37,6 +37,9 @@ playwright/.cache/
 # test environment
 env.test
 
+# Vercel deployment files
+.vercel/
+
 # Playwright auth files
 playwright/.auth/
 
