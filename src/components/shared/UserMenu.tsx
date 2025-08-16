@@ -28,7 +28,10 @@ export function UserMenu() {
       {/* User Avatar/Info */}
       <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-muted">
         <User className="h-4 w-4" />
-        <span className="text-sm font-medium text-muted-foreground">
+        <span 
+          className="text-sm font-medium text-muted-foreground"
+          data-testid="user-email"
+        >
           {user.email}
         </span>
       </div>
@@ -40,6 +43,7 @@ export function UserMenu() {
         onClick={handleSignOut}
         disabled={isLoggingOut}
         className="flex items-center space-x-1"
+        data-testid="sign-out-button"
       >
         <LogOut className="h-4 w-4" />
         <span>{isLoggingOut ? "Logging out..." : "Sign Out"}</span>
