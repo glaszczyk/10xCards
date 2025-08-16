@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "@astrojs/vercel": "^8.2.6",
     "@mswjs/data": "^0.16.2",
     "@playwright/test": "^1.54.2",
     "@testing-library/jest-dom": "^6.7.0",
