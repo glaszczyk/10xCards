@@ -4,7 +4,7 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10 # Realistic timeout dla MVP
+    timeout-minutes: 20 # Increased timeout for E2E tests
 
     steps:
       - name: Checkout code
@@ -30,11 +30,22 @@ jobs:
       - name: Run integration tests
         run: npm run test:integration
 
-      # TODO: E2E tests are currently placeholders - enable when ready
-      # - name: Install Playwright browsers
-      #   run: npx playwright install --with-deps
-      # - name: Run E2E tests
-      #   run: npm run test:e2e
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Debug environment variables
+        run: |
+          echo "PLAYWRIGHT_BASE_URL: $PLAYWRIGHT_BASE_URL"
+          echo "DATA_PROVIDER: $DATA_PROVIDER"
+          echo "SUPABASE_URL: $SUPABASE_URL"
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          DATA_PROVIDER: supabase
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL }}
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3

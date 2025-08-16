@@ -109,13 +109,16 @@ test.describe("Login Functionality", () => {
       page.locator('[data-testid="main-navigation"]')
     ).not.toBeVisible();
 
-    // Fill in valid credentials - using test data from MVPTestData
-    await loginPage.fillEmail("test@example.com");
-    await loginPage.fillPassword("testpassword123");
+    // Fill in valid credentials from environment variables or fallback to mock data
+    const email = process.env.TEST_USER_EMAIL || "test@example.com";
+    const password = process.env.TEST_USER_PASSWORD || "testpassword123";
+
+    await loginPage.fillEmail(email);
+    await loginPage.fillPassword(password);
 
     // Verify credentials were filled
-    await expect(loginPage.emailInput).toHaveValue("test@example.com");
-    await expect(loginPage.passwordInput).toHaveValue("testpassword123");
+    await expect(loginPage.emailInput).toHaveValue(email);
+    await expect(loginPage.passwordInput).toHaveValue(password);
 
     // Submit form
     await loginPage.clickLogin();
