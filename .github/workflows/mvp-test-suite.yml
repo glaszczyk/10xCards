@@ -38,6 +38,20 @@ jobs:
           echo "PLAYWRIGHT_BASE_URL: $PLAYWRIGHT_BASE_URL"
           echo "DATA_PROVIDER: $DATA_PROVIDER"
           echo "SUPABASE_URL: $SUPABASE_URL"
+          echo "Current working directory: $(pwd)"
+          echo "Files in current directory: $(ls -la)"
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+
+      - name: Test connectivity to deployed app
+        run: |
+          if [ -n "$PLAYWRIGHT_BASE_URL" ]; then
+            echo "Testing connectivity to: $PLAYWRIGHT_BASE_URL"
+            curl -I "$PLAYWRIGHT_BASE_URL" || echo "Failed to connect to app"
+            curl -I "$PLAYWRIGHT_BASE_URL/auth/login" || echo "Failed to connect to login page"
+          else
+            echo "PLAYWRIGHT_BASE_URL is not set!"
+          fi
 
       - name: Run E2E tests
         run: npm run test:e2e
