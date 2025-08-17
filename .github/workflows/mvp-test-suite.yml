@@ -4,7 +4,7 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10 # Realistic timeout dla MVP
+    timeout-minutes: 20 # Increased timeout for E2E tests
 
     steps:
       - name: Checkout code
@@ -30,11 +30,50 @@ jobs:
       - name: Run integration tests
         run: npm run test:integration
 
-      # TODO: E2E tests are currently placeholders - enable when ready
-      # - name: Install Playwright browsers
-      #   run: npx playwright install --with-deps
-      # - name: Run E2E tests
-      #   run: npm run test:e2e
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Debug environment variables
+        run: |
+          echo "PLAYWRIGHT_BASE_URL: $PLAYWRIGHT_BASE_URL"
+          echo "DATA_PROVIDER: $DATA_PROVIDER"
+          echo "SUPABASE_URL: $SUPABASE_URL"
+          echo "Current working directory: $(pwd)"
+          echo "Files in current directory: $(ls -la)"
+
+      - name: Test connectivity to deployed app
+        run: |
+          if [ -n "$PLAYWRIGHT_BASE_URL" ]; then
+            echo "Testing connectivity to: $PLAYWRIGHT_BASE_URL"
+            curl -I "$PLAYWRIGHT_BASE_URL" || echo "Failed to connect to app"
+            curl -I "$PLAYWRIGHT_BASE_URL/auth/login" || echo "Failed to connect to login page"
+          else
+            echo "PLAYWRIGHT_BASE_URL is not set!"
+          fi
+
+      - name: Run connectivity test first
+        run: |
+          # Run simple connectivity test first
+          npx playwright test tests/e2e/connectivity.test.ts --reporter=list
+        env:
+          DATA_PROVIDER: supabase
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL }}
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+
+      - name: Run full E2E tests
+        run: |
+          # Run all tests with debug info
+          DEBUG=pw:api npx playwright test --reporter=list --timeout=30000
+        env:
+          DATA_PROVIDER: supabase
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL }}
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3

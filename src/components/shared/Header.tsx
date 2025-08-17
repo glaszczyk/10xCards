@@ -32,7 +32,7 @@ export function Header({ currentPage }: HeaderProps) {
 
         {/* Navigation - pokazuj tylko gdy użytkownik jest zalogowany */}
         {isAuthenticated && (
-          <nav className="flex items-center space-x-1">
+          <nav className="flex items-center space-x-1" data-testid="main-navigation">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.href.slice(1) || (currentPage === "home" && item.href === "/");

@@ -16,6 +16,7 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.env.test
 
 # local configuration backups
 .config/
@@ -35,7 +36,12 @@ playwright/.cache/
 
 # test environment
 env.test
-.env.test
+
+# Vercel deployment files
+.vercel/
+
+# Playwright auth files
+playwright/.auth/
 
 # Vercel deployment files
 .vercel/
