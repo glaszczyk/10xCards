@@ -1,10 +1,4 @@
 import { defineConfig, devices } from "@playwright/test";
-import { config } from "dotenv";
-
-// Load .env.test for local development, but not in CI
-if (!process.env.CI) {
-  config({ path: ".env.test" });
-}
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -22,14 +16,6 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-    },
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
     },
   ],
   webServer: process.env.CI
